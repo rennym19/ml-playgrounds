@@ -93,6 +93,16 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DATETIME_FORMAT': '%b %d, %Y, %H:%M %P',
+}
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
