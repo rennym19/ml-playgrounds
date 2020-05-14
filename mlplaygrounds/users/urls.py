@@ -1,9 +1,9 @@
 from django.urls import path
 
-from mlplaygrounds.users.views import hello
+from mlplaygrounds.users.views.users import profile
 
-appname = 'users'
+app_name = 'users'
 urlpatterns = [
-    path('', hello, name='hello')
+    path('profile/', profile, name='profile')
 ]
 
