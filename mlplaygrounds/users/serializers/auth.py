@@ -113,3 +113,6 @@ class RegisterSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         return self.queryset.create_user(**validated_data)
+
+    def login(self, user):
+        login(self.request, user)

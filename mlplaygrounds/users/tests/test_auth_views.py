@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock, PropertyMock
 
-from django_mock_queries.query import MockSet, MockModel
+from django_mock_queries.query import MockModel
 
 from django.urls import reverse
 
@@ -9,7 +9,6 @@ from rest_framework.test import APIClient
 from rest_framework import status
 from rest_framework.serializers import ValidationError
 
-from mlplaygrounds.users.views.auth import Logout
 from mlplaygrounds.users.models import User
 
 
@@ -104,14 +103,3 @@ class TestLogoutView(TestCase):
         response = self.client.post(self.url)
         
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-
-class TestRegistrationView(TestCase):
-    def test_register(self):
-        pass
-    
-    def test_register_user_with_incomplete_data(self):
-        pass
-
-    def test_register_user_with_invalid_credentials(self):
-        pass
