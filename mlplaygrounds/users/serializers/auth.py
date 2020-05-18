@@ -70,7 +70,6 @@ class LogoutSerializer(serializers.Serializer):
 class RegisterSerializer(serializers.Serializer):
     first_name = serializers.CharField(max_length=255, required=True)
     last_name = serializers.CharField(max_length=255, required=True)
-    registration_date = serializers.DateTimeField(read_only=True)
     email = serializers.EmailField(max_length=255, required=True)
     username = serializers.CharField(max_length=16, required=True)
     password = serializers.CharField(max_length=255,

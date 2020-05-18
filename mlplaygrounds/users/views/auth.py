@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from mlplaygrounds.users.models import User
+from mlplaygrounds.users.serializers.users import UserSerializer
 from mlplaygrounds.users.serializers.auth import (
     LoginSerializer,
     LogoutSerializer,
@@ -52,6 +53,6 @@ class Register(APIView):
             new_user = serializer.create(serializer.validated_data)
             if new_user is not None:
                 serializer.login(new_user)
-                return Response(serializer.validated_data,
+                return Response(UserSerializer(new_user).data,
                                 status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
