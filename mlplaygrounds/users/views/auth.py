@@ -11,7 +11,6 @@ from mlplaygrounds.users.serializers.auth import (
 
 
 class Login(APIView):
-    authentication_classes = []
     permission_classes = []
 
     def post(self, request):
@@ -40,7 +39,6 @@ class Logout(APIView):
 
 
 class Register(APIView):
-    authentication_classes = []
     permission_classes = []
 
     def post(self, request):
