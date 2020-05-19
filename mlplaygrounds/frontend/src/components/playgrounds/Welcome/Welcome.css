@@ -12,6 +12,6 @@ AppInfo {
   grid-area: app-info;
 }
 
-Login {
+Auth {
   grid-area: auth;
 }

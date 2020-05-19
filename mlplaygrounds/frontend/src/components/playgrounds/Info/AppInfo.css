@@ -1,0 +1,10 @@
+.AppInfo {
+    margin: auto;
+}
+
+.AppInfo img {
+    display: block;
+    width: 65%;
+    max-width: 450px;
+    margin: auto;
+}

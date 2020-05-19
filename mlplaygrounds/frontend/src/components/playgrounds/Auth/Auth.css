@@ -1,0 +1,19 @@
+.Auth {
+  width: 65%;
+  max-width: 450px;
+  margin: auto;
+  color: black;
+  transition: all 0.3s ease 0s;
+}
+
+.Auth #forgot-password-btn {
+  display: block;
+  text-align: right;
+}
+
+.Auth #submit-btn {
+  display: block;
+  margin: 0 auto;
+  color: white;
+  background-color: #009FFF;
+}

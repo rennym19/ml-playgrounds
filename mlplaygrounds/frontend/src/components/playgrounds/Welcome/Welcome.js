@@ -1,21 +1,19 @@
 import React, { Component } from "react"
-import { render } from "react-dom"
 
 import AppInfo from '../Info/AppInfo'
-import Login from "../Login/Login"
+import Auth from "../Auth/Auth"
 
 import './Welcome.css'
 
 class Welcome extends Component {
   constructor(props) {
     super(props)
-    this.userLoggedIn = false
   }
 
   render() {
     return (
       <div className="Container">
-        <Login userLoggedIn={this.userLoggedIn}></Login>
+        <Auth loginHandler={this.props.loginHandler}></Auth>
         <AppInfo />
       </div>
     )
