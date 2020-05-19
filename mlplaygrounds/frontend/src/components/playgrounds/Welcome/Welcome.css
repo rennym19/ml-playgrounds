@@ -1,0 +1,17 @@
+.Container {
+  display: grid;
+  grid-template-columns: 6fr 6fr;
+  grid-template-rows: 100%;
+  grid-template-areas: "auth app-info";
+  height: 100%;
+  background-image: linear-gradient(to right, #30cfd0 0%, #330867 100%);
+  color: white;
+}
+
+AppInfo {
+  grid-area: app-info;
+}
+
+Login {
+  grid-area: auth;
+}
