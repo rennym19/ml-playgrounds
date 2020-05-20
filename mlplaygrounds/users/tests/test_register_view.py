@@ -38,6 +38,11 @@ class TestRegistrationView(TestCase):
             return_value=None
         )
 
+        self.user_serializer_data_patcher = patch(
+            'mlplaygrounds.users.views.auth.UserSerializer.data',
+            new_callable=PropertyMock(return_value=self.valid_data)
+        )
+
         self.register_invalid_data_patcher = patch(
             'mlplaygrounds.users.views.auth.RegisterSerializer.is_valid',
             return_value=False
@@ -52,12 +57,14 @@ class TestRegistrationView(TestCase):
         self.register_is_valid_patcher.start()
         self.register_validated_data_patcher.start()
         self.register_login_patch.start()
+        self.user_serializer_data_patcher.start()
 
         response = self.client.post(self.url, {}, format='json')
     
         self.register_is_valid_patcher.stop()
         self.register_validated_data_patcher.stop()
         self.register_login_patch.stop()
+        self.user_serializer_data_patcher.stop()
 
         self.assertDictEqual(response.data, self.valid_data)
     
