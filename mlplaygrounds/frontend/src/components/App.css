@@ -10,3 +10,7 @@ html, body {
 #app {
   height: 100%;
 }
+
+.appContainer {
+  height: 100%;
+}

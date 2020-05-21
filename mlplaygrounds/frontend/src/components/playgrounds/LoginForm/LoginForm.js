@@ -1,15 +1,15 @@
 import React, { Component } from 'react'
 import { Button, FormGroup, InputGroup } from "@blueprintjs/core"
 
+import { notifyErrors } from '../../../utils/Notifier'
+
 class LoginForm extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
       username: '',
-      password: '',
-      isLoaded: false,
-      error: undefined
+      password: ''
     }
 
     this.handleUsernameChange = this.handleUsernameChange.bind(this)
@@ -36,23 +36,13 @@ class LoginForm extends Component {
         password: this.state.password,
       })
     })
-    .then(res => res.json())
-    .then(
-      (result) => {
-        this.setState({
-          isLoaded: true,
-          password: ''
-        })
-
-        this.props.loginHandler(result.user.username, result.token)
-      },
-      (error) => {
-        this.setState({
-          isLoaded: true,
-          error: error
-        })
-      }
-    )
+    .then(res => res.json().then(data => ({status: res.status, body: data})))
+    .then(result => {
+      if (result.status === 200)
+        this.props.loginHandler(result.body.user.username, result.body.token)
+      else
+        notifyErrors(result.body)
+    })
   }
 
   render() {

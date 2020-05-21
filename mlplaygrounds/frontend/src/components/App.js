@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import { render } from 'react-dom'
-import Cookie from 'js-cookie'
+import ReactNotification from 'react-notifications-component'
 
 import Home from './playgrounds/Home/Home'
 import Welcome from './playgrounds/Welcome/Welcome'
@@ -39,9 +39,8 @@ class App extends Component {
       token: token
     })
 
-    if (saveInStorage) {
-      this.saveAuthInStorage(username, token)
-    }
+    if (saveInStorage)
+      this.saveAuthInStorage(username, token) 
   }
 
   logoutUser() {
@@ -74,10 +73,18 @@ class App extends Component {
   }
 
   render() {
-    if (this.state.userLoggedIn) {
-      return <Home token={this.state.token} logoutHandler={this.logoutUser} />
-    }
-    return <Welcome loginHandler={this.loginUser} />
+    let landingPage;
+    if (this.state.userLoggedIn)
+      landingPage = <Home token={this.state.token} logoutHandler={this.logoutUser} />
+    else
+      landingPage = <Welcome loginHandler={this.loginUser} />
+
+    return (
+      <div className='appContainer'>
+        <ReactNotification />
+        { landingPage }
+      </div>
+    )
   }
 }
 
