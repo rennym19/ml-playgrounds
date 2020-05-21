@@ -11,23 +11,37 @@ from mlplaygrounds.users.models import User
 
 
 class TestLoginSerializer(TestCase):
-    def test_login(self):
-        data = {'username': 'test', 'password': 'password'}
-        expected_user = User(**data)
-        users = MockSet(
-            expected_user
+    def setUp(self):
+        self.valid_data = {'username': 'test', 'password': 'password'}
+        self.valid_user = User(**self.valid_data)
+        self.setUpPatchers()
+
+    def setUpPatchers(self):
+        self.authenticate_patcher = patch(
+            'mlplaygrounds.users.serializers.auth.authenticate',
+            return_value=self.valid_user
         )
+
+        self.authenticate_failed_patcher = patch(
+            'mlplaygrounds.users.serializers.auth.authenticate',
+            return_value=None
+        )
+
+    def test_login(self):
+        users = MockSet(self.valid_user)
         
         LoginSerializer._get_queryset = MagicMock(return_value=users)
-        LoginSerializer.authenticate_user = MagicMock(return_value=expected_user) 
+        LoginSerializer.save = MagicMock(return_value=(self.valid_user, 'token')) 
+        self.authenticate_patcher.start()
 
-        serializer = LoginSerializer(data=data,
-                                     context={'request': MagicMock()})
+        serializer = LoginSerializer(data=self.valid_data)
 
-        with patch.object(User, 'check_password', return_value=True):
-            if serializer.is_valid():
-                user = serializer.save()
-                self.assertEqual(user.username, expected_user.username)
+        if serializer.is_valid():
+            user, token = serializer.save()
+            self.assertEqual(user.username, self.valid_user.username)
+            self.assertEqual(token, 'token')
+
+        self.authenticate_patcher.stop()
 
     def test_login_invalid_user(self):
         data = {'username': 'doesntexist', 'password': 'uselesspassword'}
@@ -38,8 +52,7 @@ class TestLoginSerializer(TestCase):
 
         LoginSerializer._get_queryset = MagicMock(return_value=users)
         
-        serializer = LoginSerializer(data=data,
-                                     context={'request': MagicMock()})
+        serializer = LoginSerializer(data=data)
 
         with self.assertRaises(ValidationError):
             serializer.is_valid(raise_exception=True)
@@ -51,13 +64,14 @@ class TestLoginSerializer(TestCase):
         )
 
         LoginSerializer._get_queryset = MagicMock(return_value=users)
+        self.authenticate_failed_patcher.start()
 
-        serializer = LoginSerializer(data=data,
-                                     context={'request': MagicMock()})
+        serializer = LoginSerializer(data=data)
         
-        with patch.object(User, 'check_password', return_value=False):
-            with self.assertRaises(ValidationError):
-                serializer.is_valid(raise_exception=True)
+        with self.assertRaises(ValidationError):
+            serializer.is_valid(raise_exception=True)
+
+        self.authenticate_failed_patcher.stop()
 
 
 class TestRegisterSerializer(TestCase):

@@ -6,7 +6,6 @@ from mlplaygrounds.users.models import User
 from mlplaygrounds.users.serializers.users import UserSerializer
 from mlplaygrounds.users.serializers.auth import (
     LoginSerializer,
-    LogoutSerializer,
     RegisterSerializer
 )
 
@@ -19,24 +18,13 @@ class Login(APIView):
             return Response({'error': 'Already logged in.'},
                             status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = LoginSerializer(data=request.data,
-                                     context={'request': request})
+        serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
+            user, token = serializer.save()
             if user is not None:
-                return Response(status=status.HTTP_204_NO_CONTENT)
+                return Response({'user': UserSerializer(user).data,
+                                 'token': token}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class Logout(APIView):
-    def post(self, request):
-        if not request.user.is_authenticated:
-            return Response({'error': 'You\'re not logged in.'},
-                            status=status.HTTP_401_UNAUTHORIZED)
-
-        serializer = LogoutSerializer(context={'request': request})
-        serializer.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class Register(APIView):
@@ -50,9 +38,9 @@ class Register(APIView):
         serializer = RegisterSerializer(data=request.data,
                                         context={'request': request})
         if serializer.is_valid():
-            new_user = serializer.create(serializer.validated_data)
-            if new_user is not None:
-                serializer.login(new_user)
-                return Response(UserSerializer(new_user).data,
-                                status=status.HTTP_201_CREATED)
+            user = serializer.create(serializer.validated_data)
+            if user is not None:
+                token = serializer.login(user)
+                return Response({'user': UserSerializer(user).data,
+                                 'token': token}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

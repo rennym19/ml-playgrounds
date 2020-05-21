@@ -1,8 +1,11 @@
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate
 
 from rest_framework import serializers
 
+from knox.models import AuthToken
+
 from mlplaygrounds.users.models import User
+from mlplaygrounds.users.serializers.users import UserSerializer
 from mlplaygrounds.users.validators.password import (
     validate_is_alpha,
     validate_is_numeric,
@@ -17,11 +20,6 @@ class LoginSerializer(serializers.Serializer):
     def __init__(self, data=serializers.empty, **kwargs):
         super().__init__(None, data, **kwargs)
         
-        self.request = self.context.get('request', None)
-        if self.request is None:
-            raise serializers.ValidationError(
-                'Request needed to authenticate user.'
-            )
         self.queryset = self._get_queryset()
     
     def _get_queryset(self):
@@ -35,36 +33,18 @@ class LoginSerializer(serializers.Serializer):
         return username
 
     def validate(self, data):
-        user = self.queryset.get(username=data['username'])
-        if not user.check_password(data['password']):
+        user = authenticate(username=data['username'],
+                            password=data['password'])
+        if user is None:
             raise serializers.ValidationError(
-                f'Invalid password for user: {user.username}'
+                f'Invalid password for user: {data["username"]}'
             )
         return data
 
     def save(self):
-        return self.authenticate_user()
-
-    def authenticate_user(self):
-        user = authenticate(self.request,
-                            username=self.validated_data['username'],
-                            password=self.validated_data['password'])
-        login(self.request, user)
-        return user
-
-
-class LogoutSerializer(serializers.Serializer):
-    def __init__(self, **kwargs):
-        super().__init__(None, serializers.empty, **kwargs)
-
-        self.request = self.context.get('request', None)
-        if self.request is None:
-            raise serializers.ValidationError(
-                'Request needed to log out.'
-            )
-
-    def save(self):
-        return logout(self.request)
+        user = User.objects.get(username=self.validated_data['username']) 
+        _, token = AuthToken.objects.create(user=user)
+        return user, token 
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -83,11 +63,6 @@ class RegisterSerializer(serializers.Serializer):
     def __init__(self, data=serializers.empty, **kwargs):
         super().__init__(None, data, **kwargs)
 
-        self.request = self.context.get('request', None)
-        if self.request is None:
-            raise serializers.ValidationError(
-                'Request needed to log in user after registration.'
-            )
         self.queryset = self._get_queryset()
 
     def _get_queryset(self):
@@ -100,9 +75,6 @@ class RegisterSerializer(serializers.Serializer):
             )
         return username
 
-    def validate_password(self, password):
-        return password
-
     def validate_email(self, email):
         if self.queryset.filter(email=email).exists():
             raise serializers.ValidationError(
@@ -114,4 +86,5 @@ class RegisterSerializer(serializers.Serializer):
         return self.queryset.create_user(**validated_data)
 
     def login(self, user):
-        login(self.request, user)
+        _, token = AuthToken.objects.create(user=user)
+        return token

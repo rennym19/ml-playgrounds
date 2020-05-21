@@ -19,6 +19,7 @@ class TestRegistrationView(TestCase):
         self.valid_data = {'username': 'john', 'email': 'john@mail.com',
                            'last_name': 'Appleseed', 'first_name': 'John',
                            'registration_date': None}
+        self.valid_token = 'token'
 
         self.setUpPatchers()
 
@@ -33,9 +34,14 @@ class TestRegistrationView(TestCase):
             new_callable=PropertyMock(return_value=self.valid_data)
         )
 
+        self.register_create_patcher = patch(
+            'mlplaygrounds.users.views.auth.RegisterSerializer.create',
+            return_value=MockModel(username=self.valid_data['username'])
+        )
+
         self.register_login_patch = patch(
             'mlplaygrounds.users.views.auth.RegisterSerializer.login',
-            return_value=None
+            return_value=self.valid_token
         )
 
         self.user_serializer_data_patcher = patch(
@@ -56,6 +62,7 @@ class TestRegistrationView(TestCase):
     def test_register(self):
         self.register_is_valid_patcher.start()
         self.register_validated_data_patcher.start()
+        self.register_create_patcher.start()
         self.register_login_patch.start()
         self.user_serializer_data_patcher.start()
 
@@ -63,10 +70,12 @@ class TestRegistrationView(TestCase):
     
         self.register_is_valid_patcher.stop()
         self.register_validated_data_patcher.stop()
+        self.register_create_patcher.stop()
         self.register_login_patch.stop()
         self.user_serializer_data_patcher.stop()
 
-        self.assertDictEqual(response.data, self.valid_data)
+        self.assertDictEqual(
+            response.data, {'user': self.valid_data, 'token': self.valid_token})
     
     def test_register_with_invalid_data(self):
         self.register_invalid_data_patcher.start()

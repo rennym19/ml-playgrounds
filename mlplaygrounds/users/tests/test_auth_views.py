@@ -16,6 +16,10 @@ class TestLoginView(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.url = reverse('users:login')
+        self.valid_user = MockModel(username='test', password='password',
+                                    email='test@mail.com', first_name='Test',
+                                    last_name='Fake', registration_date=None)
+        self.valid_token = 'token'
         self.setUpPatchers()
 
     def setUpPatchers(self):
@@ -26,7 +30,7 @@ class TestLoginView(TestCase):
 
         self.login_save_patcher = patch(
             'mlplaygrounds.users.views.auth.LoginSerializer.save',
-            return_value=MagicMock(username='test')
+            return_value=(self.valid_user, self.valid_token)
         )
         
         self.login_invalid_user_patcher = patch(
@@ -50,7 +54,7 @@ class TestLoginView(TestCase):
         self.login_is_valid_patcher.stop()
         self.login_save_patcher.stop()
 
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertEqual(response.data['user']['username'], data['username'])
     
     def test_login_invalid_user(self):
         data = {'username': 'doesntexist', 'password': 'uselesspassword'}
@@ -84,22 +88,3 @@ class TestLoginView(TestCase):
         response = self.client.post(self.url, {}, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-
-class TestLogoutView(TestCase):
-    def setUp(self):
-        self.url = reverse('users:logout')
-        self.client = APIClient()
-
-    def test_logout(self):
-        user = User(username='test', password='p')
-        
-        self.client.force_authenticate(user=user)
-        response = self.client.post(self.url)
-
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-    
-    def test_logout_unauthenticated_user(self):
-        response = self.client.post(self.url)
-        
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
