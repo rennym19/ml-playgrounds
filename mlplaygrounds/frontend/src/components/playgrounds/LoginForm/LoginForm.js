@@ -44,7 +44,7 @@ class LoginForm extends Component {
           password: ''
         })
 
-        this.props.loginHandler(this.state.username)
+        this.props.loginHandler(result.user.username, result.token)
       },
       (error) => {
         this.setState({
@@ -53,7 +53,6 @@ class LoginForm extends Component {
         })
       }
     )
-
   }
 
   render() {

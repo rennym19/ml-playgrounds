@@ -64,7 +64,7 @@ class RegisterForm extends Component {
           registered: true
         })
 
-        this.props.loginHandler(this.state.username)
+        this.props.loginHandler(result.user.username, result.token)
       },
       (error) => {
         this.setState({

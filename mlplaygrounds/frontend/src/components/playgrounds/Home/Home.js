@@ -18,7 +18,11 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    fetch('users/profile/')
+    fetch('users/profile/', {
+      headers: {
+        'Authorization': `Token ${this.props.token}`
+      }
+    })
     .then(res => res.json())
     .then(
       (result) => {
@@ -29,8 +33,6 @@ class Home extends Component {
           lastName: result.last_name,
           registrationDate: result.registration_date
         })
-
-        this.props.loginHandler(this.state.username)
       },
       (error) => {
         this.setState({
@@ -43,6 +45,9 @@ class Home extends Component {
   logout() {
     fetch('users/logout/', {
       method: 'POST',
+      headers: {
+        'Authorization': `Token ${this.props.token}`
+      }
     })
     .then(res => {
       if (res.status == 204) {

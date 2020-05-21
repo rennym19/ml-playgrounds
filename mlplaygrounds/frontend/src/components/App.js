@@ -14,38 +14,70 @@ class App extends Component {
     this.state = {
       userLoggedIn: false,
       username: undefined,
-      activeSession: Cookie.get('sessionid')
+      token: undefined 
     }
+
+    this.storage = window.localStorage
 
     this.loginUser = this.loginUser.bind(this)
     this.logoutUser = this.logoutUser.bind(this)
+    this.getAuthFromStorage = this.getAuthFromStorage.bind(this)
+    this.saveAuthInStorage = this.saveAuthInStorage.bind(this)
+    this.clearAuthStorage = this.clearAuthStorage.bind(this)
   }
 
-  loginUser(username) {
+  componentDidMount() {
+    this.getAuthFromStorage()
+  }
+
+  static get AUTH_STORAGE_ITEM() { return 'auth' }
+
+  loginUser(username, token, saveInStorage=true) {
     this.setState({
       username: username,
       userLoggedIn: true,
-      activeSession: Cookie.get('sessionid')
+      token: token
     })
+
+    if (saveInStorage) {
+      this.saveAuthInStorage(username, token)
+    }
   }
 
   logoutUser() {
     this.setState({
       userLoggedIn: false,
       username: undefined,
-      activeSession: undefined
+      token: undefined
     })
+
+    this.clearAuthStorage()
+  }
+
+  getAuthFromStorage() {
+    let auth = this.storage.getItem(App.AUTH_STORAGE_ITEM)
+    if (auth !== null) {
+      auth = JSON.parse(auth)
+      this.loginUser(auth.username, auth.token, false)
+    }
+  }
+
+  saveAuthInStorage(username, token) {
+    this.storage.setItem(
+      App.AUTH_STORAGE_ITEM,
+      JSON.stringify({username: username, token: token})
+    )
+  }
+
+  clearAuthStorage() {
+    this.storage.removeItem('auth')
   }
 
   render() {
-    return (
-      <div>
-      {this.state.activeSession
-        ? <Home loginHandler={this.loginUser} logoutHandler={this.logoutUser} />
-        : <Welcome loginHandler={this.loginUser} />
-      }
-      </div>
-    )
+    if (this.state.userLoggedIn) {
+      return <Home token={this.state.token} logoutHandler={this.logoutUser} />
+    }
+    return <Welcome loginHandler={this.loginUser} />
   }
 }
 
