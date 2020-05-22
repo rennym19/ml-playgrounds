@@ -28,7 +28,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'knox',
     'mlplaygrounds.users',
-    'mlplaygrounds.frontend'
+    'mlplaygrounds.frontend',
+    'mlplaygrounds.datasets'
 ]
 
 MIDDLEWARE = [
