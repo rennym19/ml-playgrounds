@@ -23,21 +23,24 @@ class Home extends Component {
         'Authorization': `Token ${this.props.token}`
       }
     })
-    .then(res => res.json())
+    .then(res => res.json().then(data => ({status: res.status, body: data})))
     .then(
-      (result) => {
-        this.setState({
-          username: result.username,
-          email: result.email,
-          firstName: result.first_name,
-          lastName: result.last_name,
-          registrationDate: result.registration_date
-        })
-      },
-      (error) => {
-        this.setState({
-          error: error
-        })
+      result => {
+        if (result.status === 200) {
+          this.setState({
+            username: result.username,
+            email: result.email,
+            firstName: result.first_name,
+            lastName: result.last_name,
+            registrationDate: result.registration_date
+          })
+        } else if (result.status === 401) {
+          this.props.logoutHandler()
+        } else {
+          this.setState({
+            error: error
+          })
+        } 
       }
     )
   }
