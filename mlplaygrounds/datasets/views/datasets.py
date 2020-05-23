@@ -1,12 +1,57 @@
+from django.http import Http404
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from ..db.connection import MongoAccessObject 
+from ..serializers.datasets import DatasetSerializer
+from ..db.collections import Dataset
 
 
 class Datasets(APIView):
+    def get(self, request):
+        datasets = Dataset.objects.get_all({'user_id': request.user.username})
+        return Response(datasets, status=status.HTTP_200_OK)
+
     def post(self, request):
-        data_bank = MongoAccessObject()
-        data_bank.insert(request.user.username, request.data)
-        return Response('Done. Check DB.')
+        user_data = {'user_id': request.user.username}
+        serializer = DatasetSerializer(data={**request.data, **user_data})
+        
+        if serializer.is_valid():
+            dataset = serializer.create()
+            dataset = serializer.save(dataset)
+            return Response(DatasetSerializer(dataset).data,
+                            status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class DatasetsDetail(APIView):
+    def get_document(self, uid, user_id):
+        document = Dataset.objects.get({'user_id': user_id, '_id': uid})
+        if document is None:
+            raise Http404(f'No dataset found with ID {uid}')
+        return document
+
+    def get_object(self, uid, user_id):
+        return Dataset.create(**self.get_document(uid, user_id))
+
+    def get(self, request, uid):
+        dataset = self.get_document(uid, request.user.username)
+        return Response(dataset, status=status.HTTP_200_OK)
+    
+    def put(self, request, uid):
+        dataset = self.get_object(uid, request.user.username)
+
+        serializer = DatasetSerializer(dataset, data=request.data)
+        if serializer.is_valid():
+            dataset = serializer.update()
+            return Response(DatasetSerializer(dataset).data,
+                            status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, uid):
+        deleted = Dataset.objects.delete({'user_id': user_id, '_id': uid})
+        if not deleted:
+            return Re
+
+
