@@ -28,17 +28,17 @@ class Home extends Component {
       result => {
         if (result.status === 200) {
           this.setState({
-            username: result.username,
-            email: result.email,
-            firstName: result.first_name,
-            lastName: result.last_name,
-            registrationDate: result.registration_date
+            username: result.body.username,
+            email: result.body.email,
+            firstName: result.body.first_name,
+            lastName: result.body.last_name,
+            registrationDate: result.body.registration_date
           })
         } else if (result.status === 401) {
           this.props.logoutHandler()
         } else {
           this.setState({
-            error: error
+            error: result.body.error
           })
         } 
       }
