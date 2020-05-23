@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth import get_user_model
 
-from .managers import CollectionManager
+from .managers import DatasetManager
 
 
 class Dataset:
@@ -13,7 +13,13 @@ class Dataset:
     class Meta:
         collection_name = 'datasets'
 
-    objects = CollectionManager(Meta.collection_name)
+    objects = DatasetManager(Meta.collection_name)
+
+    def create(self, **kwargs):
+        dataset = Dataset()
+        for k, v in kwargs.items():
+            setattr(dataset, k, v)
+        return dataset
 
     def __str__(self):
         return f'{self.name} by {self.user_id}'

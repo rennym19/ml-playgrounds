@@ -44,3 +44,15 @@ class CollectionManager:
         if self.collection_cls is not None and cast_into_cls:
             return cast_document(self.collection_cls, doc, many=many)
         return doc
+
+
+class DatasetManager(CollectionManager):
+    def __init__(self, collection_name):
+        super().__init__(collection_name)
+    
+    def save(self, dataset):
+        uid = self.insert({'name': dataset.name,
+                           'user_id': dataset.user_id,
+                           'data': dataset.data})
+        dataset.uid = uid
+        return dataset
