@@ -69,7 +69,7 @@ class RegisterForm extends Component {
   render() {
     return (
       <div>
-        <h1>Login</h1>
+        <h1>Register</h1>
         <p>Already have an account? 
           <a href="#" onClick={this.props.toggleLogin}> Log in.</a>
         </p>
