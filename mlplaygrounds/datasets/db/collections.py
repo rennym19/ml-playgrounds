@@ -1,5 +1,4 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 
 from .managers import DatasetManager
 
@@ -15,10 +14,11 @@ class Dataset:
 
     objects = DatasetManager(Meta.collection_name)
 
-    def create(self, **kwargs):
+    @staticmethod
+    def create(**kwargs):
         dataset = Dataset()
-        for k, v in kwargs.items():
-            setattr(dataset, k, v)
+        for field, val in kwargs.items():
+            setattr(dataset, field, val)
         return dataset
 
     def __str__(self):

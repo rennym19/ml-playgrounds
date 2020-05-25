@@ -1,10 +1,10 @@
-def get_instance(cls, single_document):
+def create_instance(cls, d):
     cls_instance = cls()
-    for k, v in single_document.items():
+    for k, v in d.items():
         setattr(cls_instance, k, v)
     return cls_instance
 
 def cast_document(cls, document, many=False):
     if many:
-        return [get_instance(cls, d) for d in document]
-    return get_instance(cls, document)
+        return [create_instance(cls, d) for d in document]
+    return create_instance(cls, document)
