@@ -5,9 +5,9 @@ from rest_framework.serializers import ValidationError
 
 from django_mock_queries.query import MockSet, MockModel
 
-from mlplaygrounds.users.serializers.auth import LoginSerializer, RegisterSerializer
+from ..serializers.auth import LoginSerializer, RegisterSerializer
 
-from mlplaygrounds.users.models import User
+from ..models import User
 
 
 class TestLoginSerializer(TestCase):
