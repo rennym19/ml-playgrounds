@@ -10,8 +10,10 @@ from ..db.collections import Dataset
 
 class Datasets(APIView):
     def get(self, request):
-        datasets = Dataset.objects.get_all({'user_id': request.user.username})
-        return Response(datasets, status=status.HTTP_200_OK)
+        datasets = Dataset.objects.get_all({'user_id': request.user.username},
+                                           cast_into_cls=Dataset)
+        serializer = DatasetSerializer(datasets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
         user_data = {'user_id': request.user.username}
@@ -25,7 +27,7 @@ class Datasets(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class DatasetsDetail(APIView):
+class DatasetDetail(APIView):
     def get_document(self, uid, user_id):
         document = Dataset.objects.get({'user_id': user_id, '_id': uid})
         if document is None:
@@ -36,8 +38,9 @@ class DatasetsDetail(APIView):
         return Dataset.create(**self.get_document(uid, user_id))
 
     def get(self, request, uid):
-        dataset = self.get_document(uid, request.user.username)
-        return Response(dataset, status=status.HTTP_200_OK)
+        dataset = self.get_object(uid, request.user.username)
+        serializer = DatasetSerializer(dataset)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def put(self, request, uid):
         dataset = self.get_object(uid, request.user.username)
@@ -50,8 +53,9 @@ class DatasetsDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, uid):
-        deleted = Dataset.objects.delete({'user_id': user_id, '_id': uid})
+        deleted = Dataset.objects.delete({'user_id': request.user.username,
+                                          '_id': uid})
         if not deleted:
-            return Re
-
-
+            raise Http404(
+                f'Could not find a dataset of id {uid} for your user')
+        return Response(status=status.HTTP_204_NO_CONTENT)

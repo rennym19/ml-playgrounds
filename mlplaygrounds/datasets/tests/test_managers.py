@@ -1,16 +1,13 @@
 from unittest import TestCase
 from unittest.mock import patch, MagicMock, PropertyMock, Mock
 
-import mongomock
-
-from ..db.managers import CollectionManager, DatasetManager
+from .mocks.managers import MockCollectionManager, MockDatasetManager
 
 
-class MockCollectionManager(CollectionManager):
-    def __init__(self):
-        self._db_client = mongomock.MongoClient()
-        self.collection = self._db_client.db.collection
-        
+class TestCollectionManager(TestCase):
+    def setUp(self):
+        self.manager = MockCollectionManager()
+
         self.dummy_data = [
             {'username': 'julia'},
             {'username': 'rita', 'age': 18},
@@ -18,12 +15,7 @@ class MockCollectionManager(CollectionManager):
             {'username': 'peter', 'age': 25},
             {'username': 'renny', 'admin': True, 'programmer': True}
         ]
-        self.collection.insert_many(self.dummy_data)
-
-
-class TestCollectionManager(TestCase):
-    def setUp(self):
-        self.manager = MockCollectionManager()
+        self.manager.collection.insert_many(self.dummy_data)
 
     def test_get(self):
         document = self.manager.get({'username': 'julia'}, {'_id': False})
@@ -31,7 +23,7 @@ class TestCollectionManager(TestCase):
 
     def test_get_all(self):
         documents = self.manager.get_all({})
-        self.assertEqual(documents, self.manager.dummy_data)
+        self.assertEqual(documents, self.dummy_data)
     
     def test_count(self):
         self.assertEqual(self.manager.count({'programmer': True}), 1)
@@ -85,12 +77,6 @@ class TestCollectionManager(TestCase):
         res = self.manager._result({'username': 'jack'},
                                    cast_into_cls=Mock)
         self.assertEqual(res.username, 'jack')
-
-
-class MockDatasetManager(DatasetManager):
-    def __init__(self):
-        self._db_client = mongomock.MongoClient()
-        self.collection = self._db_client.db.collection
 
 
 class TestDatasetManager(TestCase):
