@@ -2,6 +2,8 @@ from django.http import Http404
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.parsers import MultiPartParser
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
 
 from ..serializers.datasets import DatasetSerializer
@@ -59,3 +61,20 @@ class DatasetDetail(APIView):
             raise Http404(
                 f'Could not find a dataset of id {uid} for your user')
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+@api_view(['POST'])
+@parser_classes([MultiPartParser])
+def parse_dataset(request):
+    user_data = {'user_id': request.user.username}
+    serializer = DatasetSerializer(data={**request.data, **user_data},
+                                   multipart=True)
+    
+    print(request.data)
+
+    if serializer.is_valid():
+        dataset = serializer.create()
+        dataset = serializer.save(dataset)
+        return Response(DatasetSerializer(dataset).data,
+                        status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

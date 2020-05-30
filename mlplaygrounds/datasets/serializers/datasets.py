@@ -8,6 +8,7 @@ from ..validators.datasets import (
     validate_dataset_name_type,
     validate_dataset_name_length
 )
+from ..parsers.parser import parse_from_file
 from ..db.collections import Dataset
 
 User = get_user_model()
@@ -25,6 +26,8 @@ class DatasetSerializer(serializers.Serializer):
     data = serializers.DictField(allow_empty=True, required=False)
 
     def __init__(self, instance=None, data=serializers.empty, *args, **kwargs):
+        self.multipart = kwargs.pop('multipart', False)
+
         super().__init__(instance, data, *args, **kwargs)
 
         self.queryset = self._get_queryset()
@@ -64,6 +67,11 @@ class DatasetSerializer(serializers.Serializer):
             )
         return name
     
+    def validate_data(self, data):
+        if self.multipart:
+            return parse_from_file(data)
+        return data
+
     def validate(self, data):
         if self.queryset.filter(user_id=data['user_id'],
                                 name=data['name']).exists():
