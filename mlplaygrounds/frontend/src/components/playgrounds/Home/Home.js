@@ -1,6 +1,11 @@
 import React, { Component } from 'react'
+import { Card, Button, Text } from '@blueprintjs/core'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faFrown } from '@fortawesome/free-solid-svg-icons'
 
-import Cookie from 'js-cookie'
+import Nav from '../Nav/Nav'
+import DatasetForm from '../Datasets/Forms/DatasetForm'
+import './Home.css'
 
 class Home extends Component {
   constructor(props) {
@@ -63,9 +68,18 @@ class Home extends Component {
 
   render() {
     return (
-      <div>
-        <h1>Welcome, {this.state.username}</h1>
-        <a href="#" onClick={this.logout}>Logout</a>
+      <div id="Home">
+        <Nav id="Navbar" username={this.state.username} logout={this.logout} />
+        <div id="Content" className="no-datasets">
+          <Card id="no-datasets">
+            <FontAwesomeIcon className="card-icon" icon={faFrown} size="6x" />
+            <Text className="card-msg">Looks like you don't have any datasets yet</Text>
+            <Button className="card-btn" fill={true} minimal={true} text="Add Dataset" />
+          </Card>
+          <Card id="add-dataset-card">
+            <DatasetForm />
+          </Card>
+        </div>
       </div>
     )
   }
