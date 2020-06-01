@@ -1,6 +1,6 @@
 import { store } from 'react-notifications-component'
 
-function notify(title, message, type) {
+export function notify(title, message, type) {
   store.addNotification({
     title: title,
     message: message,
