@@ -13,7 +13,7 @@ class Welcome extends Component {
   render() {
     return (
       <div className="Container">
-        <Auth loginHandler={this.props.loginHandler}></Auth>
+        <Auth authService={this.props.authService}></Auth>
         <AppInfo />
       </div>
     )

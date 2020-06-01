@@ -5,79 +5,37 @@ import ReactNotification from 'react-notifications-component'
 import Home from './playgrounds/Home/Home'
 import Welcome from './playgrounds/Welcome/Welcome'
 
+import AuthService from '../shared/auth/AuthService';
 import './App.css'
 
 class App extends Component {
   constructor(props) {
-    super(props)
+    super(props);
 
     this.state = {
-      userLoggedIn: false,
-      username: undefined,
-      token: undefined 
-    }
+      authService: new AuthService(this),
+      loggedIn: false
+    };
 
-    this.storage = window.localStorage
-
-    this.loginUser = this.loginUser.bind(this)
-    this.logoutUser = this.logoutUser.bind(this)
-    this.getAuthFromStorage = this.getAuthFromStorage.bind(this)
-    this.saveAuthInStorage = this.saveAuthInStorage.bind(this)
-    this.clearAuthStorage = this.clearAuthStorage.bind(this)
+    this.setLoggedIn = this.setLoggedIn.bind(this);
   }
 
   componentDidMount() {
-    this.getAuthFromStorage()
+    this.state.authService.retrieveAuthFromStorage();
   }
 
-  static get AUTH_STORAGE_ITEM() { return 'auth' }
-
-  loginUser(username, token, saveInStorage=true) {
+  setLoggedIn(loggedIn) {
     this.setState({
-      username: username,
-      userLoggedIn: true,
-      token: token
-    })
-
-    if (saveInStorage)
-      this.saveAuthInStorage(username, token) 
-  }
-
-  logoutUser() {
-    this.setState({
-      userLoggedIn: false,
-      username: undefined,
-      token: undefined
-    })
-
-    this.clearAuthStorage()
-  }
-
-  getAuthFromStorage() {
-    let auth = this.storage.getItem(App.AUTH_STORAGE_ITEM)
-    if (auth !== null) {
-      auth = JSON.parse(auth)
-      this.loginUser(auth.username, auth.token, false)
-    }
-  }
-
-  saveAuthInStorage(username, token) {
-    this.storage.setItem(
-      App.AUTH_STORAGE_ITEM,
-      JSON.stringify({username: username, token: token})
-    )
-  }
-
-  clearAuthStorage() {
-    this.storage.removeItem('auth')
+      loggedIn: loggedIn
+    });
   }
 
   render() {
     let landingPage;
-    if (this.state.userLoggedIn)
-      landingPage = <Home token={this.state.token} logoutHandler={this.logoutUser} />
+    if (this.state.loggedIn)
+      landingPage = <Home authService={this.state.authService} />
     else
-      landingPage = <Welcome loginHandler={this.loginUser} />
+      landingPage = <Welcome authService={this.state.authService} />
 
     return (
       <div className='appContainer'>
@@ -88,7 +46,7 @@ class App extends Component {
   }
 }
 
-export default App
+export default App;
 
-const container = document.getElementById("app")
-render(<App />, container)
+const container = document.getElementById("app");
+render(<App />, container);

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import { Button, FormGroup, InputGroup, FileInput } from '@blueprintjs/core'
 
-import { notifyErrors } from '../../../../utils/Notifier'
 import './DatasetForm.css'
 
 class DatasetForm extends Component {
@@ -10,11 +9,12 @@ class DatasetForm extends Component {
 
     this.state = {
       'name': '',
-      'data': undefined
+      'data': {}
     }
 
     this.onChangeName = this.onChangeName.bind(this)
     this.onChangeDataFile = this.onChangeDataFile.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
   }
 
   onChangeName(event) {
@@ -26,13 +26,30 @@ class DatasetForm extends Component {
   }
 
   handleSubmit() {
-    console.log('hello')
+    let formData = new FormData()
+    formData.append('name', this.state.name)
+    formData.append('data', this.state.data)
+
+    fetch('data/parse_dataset/', {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Authorization': `Token ${this.props.token}`
+      }
+    })
+    .then(res => {
+      if (res.status == 201) {
+        console.log('created')
+      } else {
+        console.log('error')
+      }
+    })
   }
 
   render() {
     return (
       <div id="add-dataset-form">
-        <div class="form-wrapper">
+        <div className="form-wrapper">
           <h1>Add Dataset</h1>
           <FormGroup
             label="Dataset Name"

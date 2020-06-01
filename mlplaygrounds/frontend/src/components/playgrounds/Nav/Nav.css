@@ -5,3 +5,7 @@
   font-weight: bold;
   text-align: center;
 }
+
+.non-clickable {
+  cursor: default;
+}

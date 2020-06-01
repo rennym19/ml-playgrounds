@@ -28,11 +28,11 @@ class Auth extends Component {
     if (this.state.login) {
       authForm = <LoginForm 
                     toggleLogin={this.toggleLogin}
-                    loginHandler={this.props.loginHandler} />
+                    authService={this.props.authService} />
     } else {
       authForm = <RegisterForm
                     toggleLogin={this.toggleLogin}
-                    loginHandler={this.props.loginHandler} />
+                    authService={this.props.authService} />
     }
 
     return (

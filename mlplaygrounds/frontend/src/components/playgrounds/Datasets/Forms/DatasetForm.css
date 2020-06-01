@@ -6,11 +6,28 @@
   margin: 0 0 8px 0;
 }
 
+.form-wrapper label {
+  color: #9de9cf;
+}
+
+#name-input, #data-file-input span {
+  background-color: #5fdbb1;
+  border: none;
+  box-shadow: none;
+}
+
+#data-file-input span::after {
+  box-shadow: none;
+  border: none;
+  background-color: white;
+}
+
 #submit-btn {
-  background-color: #4d1ce0;
+  background-color: #1e8361;
   color: white;
   text-transform: uppercase;
   font-weight: bold;
   text-align: center;
   border-radius: 0 0 3px 3px;
+  border-color: rgba(255,255,255,0);
 }

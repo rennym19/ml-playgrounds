@@ -1,8 +1,6 @@
 import React, { Component } from 'react'
 import { Button, FormGroup, InputGroup } from "@blueprintjs/core"
 
-import { notifyErrors } from '../../../utils/Notifier'
-
 class RegisterForm extends Component {
   constructor(props) {
     super(props)
@@ -44,26 +42,13 @@ class RegisterForm extends Component {
   }
 
   handleSubmit() {
-    fetch('/users/register/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        username: this.state.username,
-        password: this.state.password,
-        email: this.state.email,
-        first_name: this.state.firstName,
-        last_name: this.state.lastName
-      })
-    })
-    .then(res => res.json().then(data => ({status: res.status, body: data})))
-    .then(result => {
-      if (result.status === 201)
-        this.props.loginHandler(result.user.username, result.token)
-      else
-        notifyErrors(result)
-    })
+    this.props.authService({
+      username: this.state.username,
+      password: this.state.password,
+      email: this.state.email,
+      firstName: this.state.firstName,
+      lastName: this.state.lastName
+    });
   }
 
   render() {
