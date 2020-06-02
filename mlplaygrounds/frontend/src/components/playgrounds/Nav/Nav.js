@@ -1,11 +1,13 @@
 import React from 'react';
-import { useSpring, animated } from 'react-spring'
-import { Navbar, Alignment, Button } from '@blueprintjs/core'
+import { useSpring, animated } from 'react-spring';
+import { Navbar, Alignment, Button } from '@blueprintjs/core';
 
-import './Nav.css'
+import './Nav.css';
 
-function Nav(props) {
-  const btnAnimation = useSpring({opacity: !props.showNavbarAddBtn ? 1 : 0})
+const Nav = (props) => {
+  const logout = () => { props.authService.logout(); }
+
+  const btnAnimation = useSpring({opacity: props.showNavbarAddBtn ? 1 : 0});
 
   return (
     <Navbar>
@@ -18,14 +20,15 @@ function Nav(props) {
             id="add-dataset-navbar-btn"
             outlined={true}
             className={props.showNavbarAddBtn ? "non-clickable" : ""}
-            text="Add Dataset"/>
+            text="Add Dataset"
+            onClick={() => props.addDataset()} />
         </animated.div>        
         <Navbar.Divider />
         <Button className="bp3-minimal" text={props.username}/>
-        <Button className="bp3-minimal" text="Logout" onClick={props.logout} />
+        <Button className="bp3-minimal" text="Logout" onClick={logout} />
       </Navbar.Group>
     </Navbar>
-  )
-}
+  );
+};
 
-export default Nav
+export default Nav;

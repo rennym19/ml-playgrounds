@@ -1,7 +1,21 @@
 import React, { Component } from 'react'
+import { Card } from '@blueprintjs/core';
 import { Button, FormGroup, InputGroup, FileInput } from '@blueprintjs/core'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 import './DatasetForm.css'
+
+const getFileName = (fullPath) => {
+  if (fullPath) {
+    let startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+    let filename = fullPath.substring(startIndex);
+    if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+        filename = filename.substring(1);
+    }
+    return filename;
+  }
+};
 
 class DatasetForm extends Component {
   constructor(props) {
@@ -9,7 +23,8 @@ class DatasetForm extends Component {
 
     this.state = {
       'name': '',
-      'data': {}
+      'data': {},
+      'datasetFileName': undefined
     }
 
     this.onChangeName = this.onChangeName.bind(this)
@@ -22,7 +37,10 @@ class DatasetForm extends Component {
   }
 
   onChangeDataFile(event) {
-    this.setState({'data': event.target.files[0]})
+    this.setState({
+      'data': event.target.files[0],
+      'datasetFileName': getFileName(event.target.value)
+    });
   }
 
   handleSubmit() {
@@ -48,9 +66,18 @@ class DatasetForm extends Component {
 
   render() {
     return (
-      <div id="add-dataset-form">
+      <Card id="add-dataset-card">
         <div className="form-wrapper">
-          <h1>Add Dataset</h1>
+          <div id="form-header">
+            <h1>Add Dataset</h1>
+            <span id="close-button-wrapper">
+              <FontAwesomeIcon
+                id="close-button"
+                icon={faTimes}
+                size="lg"
+                onClick={() => this.props.toggleShowNavbarAddBtn()}/>
+            </span>
+          </div>
           <FormGroup
             label="Dataset Name"
             labelFor="name-input">      
@@ -69,7 +96,8 @@ class DatasetForm extends Component {
             <FileInput
               id="data-file-input"
               fill={true}
-              text="Choose dataset file..."
+              placeholder="Choose dataset file..."
+              text={this.state.datasetFileName}
               onInputChange={this.onChangeDataFile} />
           </FormGroup>
         </div>
@@ -81,7 +109,7 @@ class DatasetForm extends Component {
           type="submit" 
           onClick={this.handleSubmit}
           text="Add" />
-      </div>
+      </Card>
     )
   }
 }

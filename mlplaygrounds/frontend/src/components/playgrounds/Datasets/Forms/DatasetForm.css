@@ -1,3 +1,11 @@
+#add-dataset-card {
+  margin: auto 0;
+  padding: 20px 0 0 0;
+  background-color: #2cc18f;
+  border: none;
+  color: white;
+}
+
 .form-wrapper {
   padding: 8px;
 }
@@ -8,6 +16,20 @@
 
 .form-wrapper label {
   color: #9de9cf;
+}
+
+#form-header {
+  display: flex;
+  flex-direction: row;
+}
+
+#close-button-wrapper {
+  flex-grow: 1;
+  text-align: right;
+}
+
+#close-button-wrapper #close-button {
+  cursor: pointer;
 }
 
 #name-input, #data-file-input span {

@@ -26,53 +26,8 @@
   background-position: center;
 }
 
-#no-datasets-wrapper {
-  z-index: 1;
-}
-
-#no-datasets-wrapper, #add-dataset-wrapper {
+#card-wrapper {
   grid-column: 5/9;
   grid-row: 2;
   margin: auto 0;
-}
-
-#no-datasets, #add-dataset-card {
-  margin: auto 0;
-  padding: 20px 0 0 0;
-}
-
-#no-datasets {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-
-  font-size: 18px;
-  background-color: #7049e6;
-  color: #b7a4f2;
-}
-
-#no-datasets :not(:last-child) {
-  display: block;
-  margin: 8px 0;
-}
-
-#no-datasets .card-msg {
-  padding: 12px 8px 20px 8px;
-  text-align: center;
-}
-
-#add-dataset-card {  
-  background-color: #2cc18f;
-  border: none;
-  color: white;
-}
-
-#no-datasets .card-btn {
-  background-color: #4d1ce0;
-  color: white;
-  text-transform: uppercase;
-  font-weight: bold;
-  text-align: center;
-  border-radius: 0 0 3px 3px;
 }
