@@ -4,6 +4,9 @@ import { Button, FormGroup, InputGroup, FileInput } from '@blueprintjs/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
+import DatasetValidator from '../../../../shared/validators/datasets';
+import { notifyValidatorErrors } from '../../../../shared/notifications/Notifier';
+import DatasetsAPIService from '../../../../shared/data/api/Datasets';
 import './DatasetForm.css'
 
 const getFileName = (fullPath) => {
@@ -23,12 +26,13 @@ class DatasetForm extends Component {
 
     this.state = {
       'name': '',
-      'data': {},
+      'data': undefined,
       'datasetFileName': undefined
     }
 
     this.onChangeName = this.onChangeName.bind(this)
     this.onChangeDataFile = this.onChangeDataFile.bind(this)
+    this.validate = this.validate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this)
   }
 
@@ -43,25 +47,32 @@ class DatasetForm extends Component {
     });
   }
 
-  handleSubmit() {
-    let formData = new FormData()
-    formData.append('name', this.state.name)
-    formData.append('data', this.state.data)
+  validate() {
+    const validator = new DatasetValidator({
+      name: this.state.name,
+      data: this.state.data
+    });
 
-    fetch('data/parse_dataset/', {
-      method: 'POST',
-      body: formData,
-      headers: {
-        'Authorization': `Token ${this.props.token}`
-      }
-    })
-    .then(res => {
-      if (res.status == 201) {
-        console.log('created')
-      } else {
-        console.log('error')
-      }
-    })
+    if (!validator.isValid()) {
+      notifyValidatorErrors(validator.getErrors());
+      return false;
+    }
+    return true;
+  }
+
+  handleSubmit() {
+    if (this.validate())
+      DatasetsAPIService.addDataset(
+        this.props.token,
+        { name: this.state.name, data: this.state.data },
+        () => {
+          this.setState({
+            'name': '',
+            'data': undefined,
+            'datasetFileName': undefined
+          });
+        }
+      );
   }
 
   render() {

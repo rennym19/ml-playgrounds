@@ -25,7 +25,7 @@ const Home = (props) => {
         setLastName(res.last_name)
         setRegistrationDate(res.registration_date)
       },
-      props.authService.authLogout
+      () => props.authService.authLogout()
     );
   }, []);
 
