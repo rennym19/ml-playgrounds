@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
 
 from ..serializers.datasets import DatasetSerializer
+from ..parsers.parser import parse_from_file
 from ..db.collections import Dataset
 
 
@@ -66,11 +67,11 @@ class DatasetDetail(APIView):
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
 def parse_dataset(request):
-    user_data = {'user_id': request.user.username}
-    serializer = DatasetSerializer(data={**request.data, **user_data},
-                                   multipart=True)
-    
-    print(request.data)
+    serializer = DatasetSerializer(data={
+        'name': request.data.get('name', None),
+        'data': parse_from_file(request.data.get('data', None)),
+        'user_id': request.user.username
+    })
 
     if serializer.is_valid():
         dataset = serializer.create()

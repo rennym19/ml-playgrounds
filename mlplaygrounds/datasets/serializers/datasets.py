@@ -8,7 +8,6 @@ from ..validators.datasets import (
     validate_dataset_name_type,
     validate_dataset_name_length
 )
-from ..parsers.parser import parse_from_file
 from ..db.collections import Dataset
 
 User = get_user_model()
@@ -26,8 +25,6 @@ class DatasetSerializer(serializers.Serializer):
     data = serializers.DictField(allow_empty=True, required=False)
 
     def __init__(self, instance=None, data=serializers.empty, *args, **kwargs):
-        self.multipart = kwargs.pop('multipart', False)
-
         super().__init__(instance, data, *args, **kwargs)
 
         self.queryset = self._get_queryset()
@@ -50,31 +47,19 @@ class DatasetSerializer(serializers.Serializer):
         return representation
     
     def to_internal_value(self, data):
-        internal_val = {'user_id': data['user_id'],
-                        'name': data['name'],
-                        'data': data['data']}
+        internal_val = {'user_id': data.get('user_id', None),
+                        'name': data.get('name', None),
+                        'data': data.get('data', {})}
 
         uid = data.get('uid', None)
         if not isinstance(uid, ObjectId) and uid is not None:
             internal_val['uid'] = ObjectId(data['uid'])
         
         return internal_val
-    
-    def validate_name(self, name):
-        if len(name) > 255:
-            raise serializers.ValidationError(
-                'Name can\'t have more than 255 characters.'
-            )
-        return name
-    
-    def validate_data(self, data):
-        if self.multipart:
-            return parse_from_file(data)
-        return data
 
     def validate(self, data):
-        if self.queryset.filter(user_id=data['user_id'],
-                                name=data['name']).exists():
+        if self.queryset.exists({'user_id': data['user_id'],
+                                 'name': data['name']}):
             raise serializers.ValidationError(
                 f'You already have a dataset called {data["name"]}'
             )

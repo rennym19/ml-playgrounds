@@ -11,6 +11,7 @@ from rest_framework import serializers
 
 from ..db.collections import Dataset
 from ..serializers.datasets import DatasetSerializer
+from .mocks.managers import MockDatasetManager
 
 
 class TestDatasetSerializer(TestCase):
@@ -39,51 +40,41 @@ class TestDatasetSerializer(TestCase):
                                                'user_id': instance.user_id,
                                                'data': instance.data})
 
-    @patch(
-        'mlplaygrounds.datasets.serializers.datasets.User',
-        return_value=MagicMock()
-    )
-    def test_serialize_valid_data(self, mocked_user_model):
+    def test_serialize_valid_data(self):
         data = {
             'name': 'Dataset',
             'user_id': 'testuser',
             'data': {'foo': 'bar', 'inner': {'nested': True}}
         }
 
-        mocked_user_model.objects = MockSet(MockModel(username='testuser'))
         mocked_serializer = DatasetSerializer
-        mocked_serializer._get_queryset = MagicMock(return_value=MockSet(
-            MockModel(name='Another Dataset', user_id='testuser')
-        ))
+        mocked_serializer._get_queryset = MagicMock(
+            return_value=MockDatasetManager())
+        mocked_serializer._get_queryset.exists = MagicMock(return_value=False)
         
         serializer = mocked_serializer(data=data)
 
         self.assertEqual(serializer.is_valid(), True)
 
     @patch(
-        'mlplaygrounds.datasets.serializers.datasets.User',
+        'mlplaygrounds.datasets.serializers.datasets.DatasetSerializer._get_queryset',
         return_value=MagicMock()
     )
-    def test_serialize_invalid_data(self, mocked_user_model):
+    def test_serialize_invalid_data(self, mocked_queryset):
         invalid_data = {
             'name': 'Dataset',
             'user_id': 'testuser',
             'data': {'foo': 'bar'}
         }
 
-        mocked_user_model.objects = MockSet(MockModel(username='testuser'))
-        mocked_serializer = DatasetSerializer
-        mocked_serializer._get_queryset = MagicMock(return_value=MockSet(
-            MockModel(user_id='testuser', name='Dataset')
-        ))
+        mocked_manager = MockDatasetManager()
+        mocked_manager.exists = MagicMock(return_value=True)
+        mocked_queryset.return_value = mocked_manager
         
-        serializer = mocked_serializer(data=invalid_data)
+        serializer = DatasetSerializer(data=invalid_data)
 
         with self.assertRaises(serializers.ValidationError):
             serializer.is_valid(raise_exception=True)
-
-    def test_create(self):
-        pass
 
     def test_save_valid_instance(self):
         mocked_serializer = DatasetSerializer
