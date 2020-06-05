@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db.models import Q
 from djongo import models
 
+from mlplaygrounds.datasets.db.collections import Dataset
+
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, password, email, first_name, last_name):
@@ -45,6 +47,11 @@ class User(AbstractBaseUser):
     REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
     
     objects = CustomUserManager()
+
+    @property
+    def datasets(self):
+        return Dataset.objects.get_all({'user_id': self.username}, ['name'],
+                                        cast_into_cls=Dataset)
 
     class Meta:
         db_table = 'users'

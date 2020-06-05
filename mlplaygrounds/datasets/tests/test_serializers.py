@@ -26,6 +26,22 @@ class TestDatasetSerializer(TestCase):
                                                'name': instance.name,
                                                'user_id': instance.user_id,
                                                'data': instance.data})
+
+    def test_many_instances_serialization(self):
+        instances = [ 
+            MockModel(uid=ObjectId(), name='A', user_id='u', data={'a': 'b'}),
+            MockModel(uid=ObjectId(), name='B', user_id='u', data={'a': 'b'})
+        ]
+        expected_data = [
+            {'uid': str(instance.uid),
+             'name': instance.name,
+             'user_id': instance.user_id}
+            for instance in instances
+        ]
+
+        serializer = DatasetSerializer(instances, many=True, exclude_data=True)
+
+        self.assertCountEqual(serializer.data, expected_data)
     
     def test_instance_serialization_with_id(self):
         instance = MockModel(uid=ObjectId(),

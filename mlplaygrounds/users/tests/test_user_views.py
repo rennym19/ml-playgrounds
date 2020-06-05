@@ -18,7 +18,8 @@ class TestProfileEndpoint(TestCase):
             'email': user.email,
             'first_name': user.first_name,
             'last_name': user.last_name,
-            'registration_date': None
+            'registration_date': None,
+            'datasets': [{'uid': '1234', 'name': 'example_dataset'}]
         }
 
         with patch('mlplaygrounds.users.serializers.users.UserSerializer.data',

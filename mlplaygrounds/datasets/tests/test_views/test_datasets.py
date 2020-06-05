@@ -8,16 +8,12 @@ from .testcases import DatasetViewTestCase
 
 
 class TestDatasetsViews(DatasetViewTestCase):    
-    @patch(
-        'mlplaygrounds.datasets.views.datasets.DatasetSerializer.data',
-        new_callable=PropertyMock
-    )
+    @patch('mlplaygrounds.datasets.views.datasets.DatasetSerializer.data')
     def test_get(self, mock_data):
         expected_document = {
-            'uid': str(self.dummy_data[0]['uid']),
+            'uid': str(self.dummy_data[0]['_id']),
             'name': self.dummy_data[0]['name'],
-            'user_id': self.dummy_data[0]['user_id'],
-            'data': self.dummy_data[0]['data']
+            'user_id': self.dummy_data[0]['user_id']
         }
         mock_data.return_value = [expected_document]
 

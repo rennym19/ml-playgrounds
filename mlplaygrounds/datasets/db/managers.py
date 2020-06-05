@@ -20,8 +20,8 @@ class CollectionManager:
         
         return self._result(document, cast_into_cls=cast_into_cls)  
 
-    def get_all(self, filter_by, limit=0, cast_into_cls=None):
-        cursor = self.collection.find(filter_by, limit=limit)
+    def get_all(self, filter_by, projection=None, limit=0, cast_into_cls=None):
+        cursor = self.collection.find(filter_by, projection, limit=limit)
         return self._result(list(cursor), True, cast_into_cls=cast_into_cls)
 
     def count(self, filter_by):

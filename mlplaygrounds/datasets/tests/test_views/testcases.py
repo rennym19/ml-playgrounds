@@ -27,13 +27,13 @@ class DatasetViewTestCase(TestCase):
     def setUpMocks(self):
         self.dummy_data = [
             {
-                'uid': ObjectId(),
+                '_id': ObjectId(),
                 'name': 'First Dataset',
                 'user_id': 'john',
                 'data': {'foo': 'bar'}
             },
             {
-                'uid': ObjectId(),
+                '_id': ObjectId(),
                 'name': 'Second Dataset',
                 'user_id': 'mike',
                 'data': {'numbers': [1, 2, 3]}

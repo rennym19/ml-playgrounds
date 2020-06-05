@@ -25,6 +25,8 @@ class DatasetSerializer(serializers.Serializer):
     data = serializers.DictField(allow_empty=True, required=False)
 
     def __init__(self, instance=None, data=serializers.empty, *args, **kwargs):
+        self.exclude_data = kwargs.pop('exclude_data', False)
+
         super().__init__(instance, data, *args, **kwargs)
 
         self.queryset = self._get_queryset()
@@ -35,14 +37,20 @@ class DatasetSerializer(serializers.Serializer):
     def to_representation(self, instance):
         representation = {}
 
-        if instance.uid is not None:
+        if hasattr(instance, 'uid') and instance.uid is not None:
             representation['uid'] = str(instance.uid)
         else:
             representation['uid'] = None
 
-        representation['user_id'] = instance.user_id
+        if hasattr(instance, 'user_id') and instance.user_id is not None:
+            representation['user_id'] = instance.user_id
+        else:
+            representation['user_id'] = None
+        
         representation['name'] = instance.name
-        representation['data'] = instance.data
+
+        if not self.exclude_data:
+            representation['data'] = instance.data
 
         return representation
     

@@ -2,8 +2,9 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSpring, animated } from 'react-spring';
 
 import UsersAPIService from '../../../shared/data/api/Users';
-import DatasetForm from '../Datasets/Forms/DatasetForm';
-import NoDatasets from '../Datasets/Info/NoDatasets';
+import NoDatasets from '../Datasets/NoDatasets';
+import SelectDatasetCard from '../Datasets/Cards/SelectDatasetCard';
+import Dataset from '../Datasets/Dataset';
 import Nav from '../Nav/Nav';
 import './Home.css';
 
@@ -13,17 +14,20 @@ const Home = (props) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [registrationDate, setRegistrationDate] = useState('');
+  const [datasets, setDatasets] = useState([]);
+  const [selectedDataset, setSelectedDataset] = useState(undefined);
   const [showNavbarAddBtn, setShowNavbarAddBtn] = useState(true);
 
   useEffect(() => {
     UsersAPIService.retrieveUserProfile(
       props.authService.token,
       res => {
-        setUsername(res.username)
-        setEmail(res.email)
-        setFirstName(res.first_name)
-        setLastName(res.last_name)
-        setRegistrationDate(res.registration_date)
+        setUsername(res.username);
+        setEmail(res.email);
+        setFirstName(res.first_name);
+        setLastName(res.last_name);
+        setRegistrationDate(res.registration_date);
+        setDatasets(res.datasets);
       },
       () => props.authService.authLogout()
     );
@@ -38,17 +42,30 @@ const Home = (props) => {
         showNavbarAddBtn={showNavbarAddBtn}
         username={username}
         authService={props.authService}
-        addDataset={toggleShowNavbarAddBtn} />
-      <div id="Content" className="no-datasets">
-        <animated.div id="card-wrapper">
-          { 
-            showNavbarAddBtn
-              ? <NoDatasets toggleShowNavbarAddBtn={toggleShowNavbarAddBtn} />
-              : <DatasetForm
-                  token={props.authService.token}
-                  toggleShowNavbarAddBtn={toggleShowNavbarAddBtn} />
-          }
-        </animated.div>
+        addDataset={toggleShowNavbarAddBtn}
+        datasets={datasets}
+        selectedDataset={selectedDataset}
+        setSelectedDataset={setSelectedDataset} />
+      <div id="Content" className={selectedDataset !== undefined ? "unselected-dataset" : ""}>
+        {
+          selectedDataset !== undefined
+            ? <Dataset
+                authService={props.authService}
+                selectedDataset={selectedDataset} />
+            : <animated.div id="card-wrapper">
+                {
+                  datasets.length === 0 || !showNavbarAddBtn
+                  ? <NoDatasets
+                    authService={props.authService}
+                    showNavbarAddBtn={showNavbarAddBtn}
+                    toggleShowNavbarAddBtn={toggleShowNavbarAddBtn} />
+                  : <SelectDatasetCard
+                      authService={props.authService}
+                      datasets={datasets}
+                      setSelectedDataset={setSelectedDataset} />
+                }
+              </animated.div>
+        }
       </div>
     </div>
   );

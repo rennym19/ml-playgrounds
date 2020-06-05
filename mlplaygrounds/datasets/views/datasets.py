@@ -6,6 +6,8 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
 
+from bson import ObjectId
+
 from ..serializers.datasets import DatasetSerializer
 from ..parsers.parser import parse_from_file
 from ..db.collections import Dataset
@@ -15,7 +17,7 @@ class Datasets(APIView):
     def get(self, request):
         datasets = Dataset.objects.get_all({'user_id': request.user.username},
                                            cast_into_cls=Dataset)
-        serializer = DatasetSerializer(datasets, many=True)
+        serializer = DatasetSerializer(datasets, many=True, exclude_data=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -38,7 +40,7 @@ class DatasetDetail(APIView):
         return document
 
     def get_object(self, uid, user_id):
-        return Dataset.create(**self.get_document(uid, user_id))
+        return Dataset.create(**self.get_document(ObjectId(uid), user_id))
 
     def get(self, request, uid):
         dataset = self.get_object(uid, request.user.username)

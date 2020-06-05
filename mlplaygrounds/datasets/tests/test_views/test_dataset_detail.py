@@ -1,5 +1,7 @@
 from unittest.mock import patch, PropertyMock, MagicMock
 
+from django_mock_queries.query import MockModel
+
 from django.urls import reverse
 from django.http import Http404
 
@@ -94,16 +96,14 @@ class TestDatasetDetailViews(DatasetViewTestCase):
         with self.assertRaises(Http404):
             view.get_document('id', 'user_id')
 
-    @patch(
-        'mlplaygrounds.datasets.views.datasets.DatasetDetail.get_document',
-        return_value=MagicMock()
-    )
+    @patch('mlplaygrounds.datasets.views.datasets.DatasetDetail.get_document')
     def test_get_object(self, mock_get_document):
         document = {'name': 'test', 'user_id': 'user', 'data': {'foo': 'bar'}}
         mock_get_document.return_value = document
 
         view = DatasetDetail()
-        dataset = view.get_object('id', 'user')
+        dataset = view.get_object(str(self.dummy_data[0]['_id']),
+                                  self.dummy_data[0]['user_id'])
 
         created_object_data = {
             'name': dataset.name,
