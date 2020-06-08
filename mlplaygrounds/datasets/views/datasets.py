@@ -9,7 +9,8 @@ from rest_framework import status
 from bson import ObjectId
 
 from ..serializers.datasets import DatasetSerializer
-from ..parsers.parser import parse_from_file
+from ..parsers.parser import DatasetParser
+from ..parsers.exceptions import (InvalidFormat, InvalidFile, InvalidFeature)
 from ..db.collections import Dataset
 
 
@@ -69,9 +70,18 @@ class DatasetDetail(APIView):
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
 def parse_dataset(request):
+    parser = DatasetParser(request.data.get('data', None), 'csv', 'json')
+
+    try:
+        parsed_dataset = parser.parse()
+    except (InvalidFormat, InvalidFile, InvalidFeature) as e:
+        return Response({
+            'error': getattr(e, 'message', str(e))
+        }, status=status.HTTP_400_BAD_REQUEST)
+
     serializer = DatasetSerializer(data={
         'name': request.data.get('name', None),
-        'data': parse_from_file(request.data.get('data', None)),
+        'data': parsed_dataset,
         'user_id': request.user.username
     })
 

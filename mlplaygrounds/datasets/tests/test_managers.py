@@ -2,6 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock, PropertyMock, Mock
 
 from .mocks.managers import MockCollectionManager, MockDatasetManager
+from mlplaygrounds.datasets.db.collections import Dataset
 
 
 class TestCollectionManager(TestCase):
@@ -84,7 +85,7 @@ class TestDatasetManager(TestCase):
         self.manager = MockDatasetManager()
 
     def test_save(self):
-        dataset = Mock()
+        dataset = Dataset()
         dataset.name = 'Dataset'
         dataset.user_id = 'john'
         dataset.data = {'a': 'b'}

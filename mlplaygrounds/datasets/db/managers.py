@@ -62,7 +62,34 @@ class DatasetManager(CollectionManager):
         super().__init__(DATABASE_SETTINGS['NAME'], collection_name)
     
     def save(self, dataset):
-        dataset.uid = self.insert({'name': dataset.name,
-                                   'user_id': dataset.user_id,
-                                   'data': dataset.data})
+        dataset.uid = self.insert(self._generate_document(dataset))
         return dataset
+
+    def _generate_document(self, dataset):
+        data = {
+            'name': dataset.name,
+            'user_id': dataset.user_id,
+            'data': dataset.data,
+        }
+
+        records = getattr(dataset, 'num_records', None)
+        if records is not None:
+            data['num_records'] = records
+        
+        features = getattr(dataset, 'features', None)
+        if features is not None:
+            data['features'] = features
+        
+        label = getattr(dataset, 'label', None)
+        if label is not None:
+            data['label'] = label
+        
+        index_col = getattr(dataset, 'index_col', None)
+        if index_col is not None:
+            data['index_col'] = index_col
+        
+        original_format = getattr(dataset, 'original_format', None)
+        if original_format is not None:
+            data['original_format'] = original_format
+
+        return data
