@@ -85,7 +85,7 @@ class AuthService {
   }
 
   clearAuthStorage() {
-    this.storage.removeItem(AuthService.AUTH_STORAGE_ITEM);
+    this.storage.clear();
   }
 }
 

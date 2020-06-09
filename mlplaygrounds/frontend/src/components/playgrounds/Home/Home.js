@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useSpring, animated } from 'react-spring';
 
 import UsersAPIService from '../../../shared/data/api/Users';
+import DatasetPreferences from '../../../shared/preferences/DatasetPreferences';
 import NoDatasets from '../Datasets/NoDatasets';
 import SelectDatasetCard from '../Datasets/Cards/SelectDatasetCard';
 import Dataset from '../Datasets/Dataset';
@@ -19,6 +20,10 @@ const Home = (props) => {
   const [showNavbarAddBtn, setShowNavbarAddBtn] = useState(true);
 
   useEffect(() => {
+    let retrievedDataset = DatasetPreferences.retrieveSelectedDataset();
+    if (retrievedDataset !== undefined)
+      setSelectedDataset(retrievedDataset);
+
     UsersAPIService.retrieveUserProfile(
       props.authService.token,
       res => {
@@ -33,6 +38,10 @@ const Home = (props) => {
     );
   }, []);
 
+  useEffect(() => {
+    DatasetPreferences.saveSelectedDataset(selectedDataset);
+  }, [selectedDataset]);
+
   const toggleShowNavbarAddBtn = () => { setShowNavbarAddBtn(!showNavbarAddBtn); }
 
   return (
@@ -46,7 +55,7 @@ const Home = (props) => {
         datasets={datasets}
         selectedDataset={selectedDataset}
         setSelectedDataset={setSelectedDataset} />
-      <div id="Content" className={selectedDataset !== undefined ? "unselected-dataset" : ""}>
+      <div id="Content" className={selectedDataset === undefined ? "unselected-dataset" : ""}>
         {
           selectedDataset !== undefined
             ? <Dataset

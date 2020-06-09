@@ -1,0 +1,30 @@
+#dataset {
+  grid-column: 1/13;
+  grid-row: 1/4;
+
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: 120px auto auto;
+  grid-column-gap: 2em;
+  grid-row-gap: 1em;
+}
+
+#records-card {
+  grid-column: 1/4;
+  grid-row: 1;
+}
+
+#features-card {
+  grid-column: 4/7;
+  grid-row: 1;
+}
+
+#nan-card {
+  grid-column: 7/10;
+  grid-row: 1;
+}
+
+#data-visualization {
+  grid-column: 1/10;
+  grid-row: 2/4;
+}

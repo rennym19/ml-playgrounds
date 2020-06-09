@@ -99,6 +99,10 @@ class ParsedDataset:
     
     def get_index_col(self):
         return self.index_col
+    
+    def get_not_assigned_pct(self):
+        na_pct = self.data.isnull().mean() * 100
+        return round(na_pct.mean(), 2)
 
     def get_original_format(self):
         return self.original_format

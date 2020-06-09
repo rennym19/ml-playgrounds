@@ -29,6 +29,7 @@ class DatasetSerializer(serializers.Serializer):
     label = serializers.CharField(read_only=True)
     num_records = serializers.IntegerField(read_only=True)
     original_format = serializers.CharField(read_only=True)
+    not_assigned_pct = serializers.FloatField(read_only=True)
 
     def __init__(self, instance=None, data=serializers.empty, *args, **kwargs):
         self.exclude_data = kwargs.pop('exclude_data', False)
@@ -64,6 +65,8 @@ class DatasetSerializer(serializers.Serializer):
                 instance, 'num_records', None)
             representation['original_format'] = getattr(
                 instance, 'original_format', None)
+            representation['not_assigned_pct'] = getattr(
+                instance, 'not_assigned_pct', None)
 
         return representation
     
@@ -90,6 +93,7 @@ class DatasetSerializer(serializers.Serializer):
             internal_val['label'] = parsed_data.get_label()
             internal_val['num_records'] = parsed_data.get_num_records()
             internal_val['original_format'] = parsed_data.get_original_format()
+            internal_val['not_assigned_pct'] = parsed_data.get_not_assigned_pct()
 
         return internal_val
 

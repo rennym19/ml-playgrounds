@@ -68,10 +68,10 @@ class TestDatasetParser(TestCase):
 class TestParsedDataset(TestCase):
     def setUp(self):
         self.test_df = pd.DataFrame({
-            'name': ['New York', 'Tokyo', 'Coro'],
-            'population(m)': [8.4, 9.3, 0.2],
-            'large_city': [True, True, False]
-        }, index=[1, 2, 3])
+            'name': ['New York', 'Tokyo', 'Coro', 'Madrid'],
+            'population(m)': [8.4, 9.3, 0.2, None],
+            'large_city': [True, True, False, True]
+        }, index=[1, 2, 3, 4])
 
         self.parsed_dataset = ParsedDataset({},
                                             self.test_df,
@@ -83,7 +83,7 @@ class TestParsedDataset(TestCase):
             ParsedDataset({}, self.test_df, 'price')
 
     def test_get_num_records(self):
-        self.assertEqual(self.parsed_dataset.get_num_records(), 3)
+        self.assertEqual(self.parsed_dataset.get_num_records(), 4)
 
     def test_get_features(self):
         self.assertListEqual(self.parsed_dataset.get_features(),
@@ -92,6 +92,10 @@ class TestParsedDataset(TestCase):
     def test_get_label(self):
         self.assertEqual(self.parsed_dataset.get_label(),
                          'large_city')
+
+    def test_get_na_pct(self):
+        self.assertAlmostEqual(self.parsed_dataset.get_not_assigned_pct(),
+                               8.33)
 
     def test_get_original_data_format(self):
         self.assertEqual(self.parsed_dataset.get_original_format(),

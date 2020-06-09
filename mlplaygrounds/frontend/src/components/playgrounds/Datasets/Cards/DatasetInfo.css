@@ -1,0 +1,36 @@
+.info-card {
+  display: flex;
+  flex-direction: row;
+  height: 120px;
+}
+
+#info-wrapper {
+  display: flex;
+  flex-direction: column;
+}
+
+#info-title {
+  text-transform: uppercase;
+  color: #323232;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#info-val {
+  flex-grow: 1;
+
+  display: flex;
+  align-items: center;
+
+  color: #0c0c0c;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+#icon-wrapper {
+  flex-grow: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: right;
+}
