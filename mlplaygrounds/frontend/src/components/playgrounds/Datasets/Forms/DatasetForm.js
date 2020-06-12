@@ -27,11 +27,13 @@ class DatasetForm extends Component {
     this.state = {
       'name': '',
       'data': undefined,
-      'datasetFileName': undefined
+      'datasetFileName': undefined,
+      'label': ''
     }
 
     this.onChangeName = this.onChangeName.bind(this)
     this.onChangeDataFile = this.onChangeDataFile.bind(this)
+    this.onChangeLabel = this.onChangeLabel.bind(this)
     this.validate = this.validate.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this)
   }
@@ -47,10 +49,17 @@ class DatasetForm extends Component {
     });
   }
 
+  onChangeLabel(event) {
+    this.setState({
+      'label': event.target.value
+    });
+  }
+
   validate() {
     const validator = new DatasetValidator({
       name: this.state.name,
-      data: this.state.data
+      data: this.state.data,
+      label: this.state.label
     });
 
     if (!validator.isValid()) {
@@ -64,12 +73,13 @@ class DatasetForm extends Component {
     if (this.validate())
       DatasetsAPIService.addDataset(
         this.props.token,
-        { name: this.state.name, data: this.state.data },
+        { name: this.state.name, label: this.state.label, data: this.state.data },
         () => {
           this.setState({
             'name': '',
             'data': undefined,
-            'datasetFileName': undefined
+            'datasetFileName': undefined,
+            'label': ''
           });
         }
       );
@@ -103,13 +113,23 @@ class DatasetForm extends Component {
           <FormGroup
             label="Data File"
             labelFor="data-file-input">
-
             <FileInput
               id="data-file-input"
               fill={true}
               placeholder="Choose dataset file..."
               text={this.state.datasetFileName}
               onInputChange={this.onChangeDataFile} />
+          </FormGroup>
+          <FormGroup
+            label="Label Name"
+            labelFor="label-input">      
+            <InputGroup
+              id="label-input"
+              placeholder="Enter label name (optional)"
+              type="text"
+              fill={true}
+              value={this.state.label}
+              onChange={this.onChangeLabel} />
           </FormGroup>
         </div>
         <Button

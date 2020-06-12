@@ -73,9 +73,11 @@ class TestParsedDataset(TestCase):
             'large_city': [True, True, False, True]
         }, index=[1, 2, 3, 4])
 
+        self.test_y = self.test_df['large_city'].copy().to_list()
+
         self.parsed_dataset = ParsedDataset({},
                                             self.test_df,
-                                            'large_city',
+                                            label='large_city',
                                             original_format='csv')
     
     def test_initialize_with_invalid_label(self):
@@ -93,9 +95,13 @@ class TestParsedDataset(TestCase):
         self.assertEqual(self.parsed_dataset.get_label(),
                          'large_city')
 
+    def test_get_label_data(self):
+        self.assertEqual(self.parsed_dataset.get_label_data(),
+                         self.test_y)
+
     def test_get_na_pct(self):
         self.assertAlmostEqual(self.parsed_dataset.get_not_assigned_pct(),
-                               8.33)
+                               12.5)
 
     def test_get_original_data_format(self):
         self.assertEqual(self.parsed_dataset.get_original_format(),

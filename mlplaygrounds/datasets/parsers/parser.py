@@ -72,18 +72,21 @@ class ParsedDataset:
         self.parsed_data = parsed_data
         self.data = data
         self.label = label
+        self.label_data = None
         self.index_col = index_col
         self.original_format = original_format
 
-        if self.label is not None and not self._label_is_valid():
-            raise InvalidFeature(
-                f'Could not set label: {self.label} is not a valid column')
+        if self.label is not None:
+            if self._label_is_valid():
+                self.label_data = self.data.pop(self.label)
+            else:
+                raise InvalidFeature(
+                    f'Could not set label: {self.label} is not a valid column')
     
     def _label_is_valid(self):
         if self.label in [col for col in self.data.columns]:
             return True
-        else:
-            False
+        return False
 
     def get_data(self):
         return self.parsed_data
@@ -97,6 +100,9 @@ class ParsedDataset:
     def get_label(self):
         return self.label
     
+    def get_label_data(self):
+        return self.label_data.to_list() if self.label is not None else None
+
     def get_index_col(self):
         return self.index_col
     

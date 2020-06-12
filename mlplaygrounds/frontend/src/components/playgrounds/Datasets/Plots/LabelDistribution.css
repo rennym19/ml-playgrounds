@@ -1,0 +1,25 @@
+#label-distribution #info-wrapper {
+  height: 20%;
+}
+
+#label-distribution #title {
+  display: block;
+  text-transform: uppercase;
+  color: #323232;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#label-distribution #value {
+  display: block;
+  color: #0c0c0c;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+#label-distribution #plot-wrapper {
+  height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

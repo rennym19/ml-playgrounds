@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import { Spinner } from '@blueprintjs/core';
 import { faListOl, faColumns, faPercentage } from '@fortawesome/free-solid-svg-icons';
 
 import DatasetsAPIService from '../../../shared/data/api/Datasets';
 import DatasetInfo from './Cards/DatasetInfo';
+import DatasetDescription from './Cards/DatasetDescription';
 import DatasetPlot from '../Plots/DatasetPlot';
+import LabelDistribution from './Plots/LabelDistribution';
+import UserWelcomeCard from '../Users/UserWelcomeCard';
 import './Dataset.css';
 
 const Dataset = (props) => {
@@ -11,7 +15,7 @@ const Dataset = (props) => {
 
   useEffect(() => {
     getDataset();
-  }, [dataset]);
+  }, [props.selectedDataset]);
 
   const getDataset = () => {
     DatasetsAPIService.getDataset(
@@ -24,6 +28,9 @@ const Dataset = (props) => {
   return (
     dataset !== undefined 
       ? <div id="dataset">
+          <UserWelcomeCard
+            id="user-card"
+            username={props.authService.username}/>
           <DatasetInfo
             id="records-card"
             title="Number of Records"
@@ -45,10 +52,24 @@ const Dataset = (props) => {
           <div id="data-visualization">
             <DatasetPlot
               title={dataset.name}
-              columns={dataset.features}/>
+              label={dataset.label}
+              columns={
+                dataset.features !== undefined && dataset.label !== undefined
+                  ? dataset.features.concat([dataset.label])
+                  : dataset.features
+              }/>
+          </div>
+          <div id="dataset-data">
+            <LabelDistribution
+              label={dataset.label} />
+          </div>
+          <div id="dataset-description">
+            <DatasetDescription />
           </div>
         </div>
-      : <div id="loading">Loading</div>
+      : <div id="loading">
+          <Spinner />
+        </div>
   );
 };
 

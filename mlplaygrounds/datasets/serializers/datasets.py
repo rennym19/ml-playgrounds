@@ -27,6 +27,7 @@ class DatasetSerializer(serializers.Serializer):
     index_col = serializers.CharField(read_only=True)
     features = serializers.ListField(read_only=True)
     label = serializers.CharField(read_only=True)
+    label_data = serializers.ListField(read_only=True)
     num_records = serializers.IntegerField(read_only=True)
     original_format = serializers.CharField(read_only=True)
     not_assigned_pct = serializers.FloatField(read_only=True)
@@ -61,6 +62,8 @@ class DatasetSerializer(serializers.Serializer):
             representation['index_col'] = getattr(instance, 'index_col', None)
             representation['features'] = getattr(instance, 'features', None)
             representation['label'] = getattr(instance, 'label', None)
+            representation['label_data'] = getattr(
+                instance, 'label_data', None)
             representation['num_records'] = getattr(
                 instance, 'num_records', None)
             representation['original_format'] = getattr(
@@ -91,6 +94,7 @@ class DatasetSerializer(serializers.Serializer):
             internal_val['index_col'] = parsed_data.get_index_col()
             internal_val['features'] = parsed_data.get_features()
             internal_val['label'] = parsed_data.get_label()
+            internal_val['label_data'] = parsed_data.get_label_data()
             internal_val['num_records'] = parsed_data.get_num_records()
             internal_val['original_format'] = parsed_data.get_original_format()
             internal_val['not_assigned_pct'] = parsed_data.get_not_assigned_pct()

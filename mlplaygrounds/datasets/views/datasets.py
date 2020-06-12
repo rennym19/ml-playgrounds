@@ -70,13 +70,17 @@ class DatasetDetail(APIView):
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
 def parse_dataset(request):
-    parser = DatasetParser(request.data.get('data', None), 'csv', 'json')
+    label = request.data.get('label', None)
+    parser = DatasetParser(request.data.get('data', None),
+                           file_format='csv',
+                           to_format='json',
+                           label=label if label != '' else None)
 
     try:
         parsed_dataset = parser.parse()
     except (InvalidFormat, InvalidFile, InvalidFeature) as e:
         return Response({
-            'error': getattr(e, 'message', str(e))
+            'error': str(e)
         }, status=status.HTTP_400_BAD_REQUEST)
 
     serializer = DatasetSerializer(data={

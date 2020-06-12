@@ -10,3 +10,7 @@
 .non-clickable {
   cursor: default;
 }
+
+#nav-select-dataset-wrapper button {
+  background-color: #e5e5e5;
+}

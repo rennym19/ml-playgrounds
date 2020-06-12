@@ -25,9 +25,11 @@ export function notifyValidatorErrors(fieldErrors) {
 
 export function notifyErrors(errors) {
   if (errors.hasOwnProperty('non_field_errors')) {
-    notifyNonFieldErrors(errors)
+    notifyNonFieldErrors(errors);
+  } else if (errors.hasOwnProperty('error')) {
+    notify('Error', errors.error, 'danger');
   } else {
-    notifyFieldErrors(errors)
+    notifyFieldErrors(errors);
   }
 }
 

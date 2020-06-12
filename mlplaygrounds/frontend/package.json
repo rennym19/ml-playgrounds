@@ -38,7 +38,9 @@
     "@fortawesome/react-fontawesome": "^0.1.9",
     "animate.css": "^4.1.0",
     "babel-loader": "^8.1.0",
+    "chart.js": "^2.9.3",
     "js-cookie": "^2.2.1",
+    "react-chartjs-2": "^2.9.0",
     "react-notifications-component": "^2.4.0",
     "react-spring": "^8.0.27"
   }

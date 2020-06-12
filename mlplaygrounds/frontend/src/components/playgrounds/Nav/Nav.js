@@ -20,10 +20,12 @@ const Nav = (props) => {
           props.selectedDataset !== undefined
             ? <>
                 <Navbar.Divider />
-                <SelectDatasetForm
-                  dataset={props.selectedDataset}
-                  datasets={props.datasets}
-                  handleItemSelect={handleItemSelect} />
+                <div id="nav-select-dataset-wrapper">
+                  <SelectDatasetForm
+                    dataset={props.selectedDataset}
+                    datasets={props.datasets}
+                    handleItemSelect={handleItemSelect} />
+                </div>
               </>
             : <></>
         }
@@ -38,7 +40,7 @@ const Nav = (props) => {
             onClick={() => props.addDataset()} />
         </animated.div>        
         <Navbar.Divider />
-        <Button className="bp3-minimal" text={props.username}/>
+        <Button className="bp3-minimal" text={props.authService.username}/>
         <Button className="bp3-minimal" text="Logout" onClick={logout} />
       </Navbar.Group>
     </Navbar>

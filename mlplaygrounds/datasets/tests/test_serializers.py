@@ -22,6 +22,7 @@ class TestDatasetSerializer(TestCase):
                                         data={'id': 1, 'foo': 'bar', 'bool': True},
                                         index_col='id',
                                         label='foo',
+                                        label_data='bar',
                                         num_records=1,
                                         features=['foo', 'bar'],
                                         original_format='csv',
@@ -34,6 +35,7 @@ class TestDatasetSerializer(TestCase):
             'data': self.valid_instance.data,
             'index_col': self.valid_instance.index_col,
             'label': self.valid_instance.label,
+            'label_data': self.valid_instance.label_data,
             'num_records': self.valid_instance.num_records,
             'features': self.valid_instance.features,
             'original_format': self.valid_instance.original_format,
@@ -92,7 +94,8 @@ class TestDatasetSerializer(TestCase):
         mock_data.get_data.return_value = [{'foo': 'bar'}]
         mock_data.get_index_col.return_value = 'test_id'
         mock_data.get_features.return_value = ['test_col1', 'test_col2']
-        mock_data.get_label.return_value = 'test_label'
+        mock_data.get_label.return_value = 'test_label_col'
+        mock_data.get_label_data.return_value = 'test_label'
         mock_data.get_num_records.return_value = 3
         mock_data.get_original_format.return_value = 'format'
         mock_data.get_not_assigned_pct.return_value = 1
@@ -117,6 +120,7 @@ class TestDatasetSerializer(TestCase):
             'data': dataset.data,
             'features': dataset.features,
             'label': dataset.label,
+            'label_data': dataset.label_data,
             'index_col': dataset.index_col,
             'num_records': dataset.num_records,
             'original_format': dataset.original_format,
@@ -126,7 +130,8 @@ class TestDatasetSerializer(TestCase):
             'user_id': data['user_id'],
             'data': [{'foo': 'bar'}],
             'features': ['test_col1', 'test_col2'],
-            'label': 'test_label',
+            'label': 'test_label_col',
+            'label_data': 'test_label',
             'index_col': 'test_id',
             'num_records': 3,
             'original_format': 'format',

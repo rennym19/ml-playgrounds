@@ -20,6 +20,7 @@ const SelectDatasetForm = (props) => {
       itemRenderer={renderDataset}
       onItemSelect={props.handleItemSelect} >
         <Button
+          minimal={true}
           text={props.dataset === undefined ? 'Select a Dataset' : props.dataset.name}
           rightIcon="caret-down" />
     </Select>

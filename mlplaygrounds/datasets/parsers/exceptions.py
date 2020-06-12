@@ -1,10 +1,19 @@
-class InvalidFormat(Exception):
+class ParserException(Exception):
+    def __init__(self, message):
+        super().__init__()
+        self.message = message
+    
+    def __str__(self):
+        return self.message
+
+
+class InvalidFormat(ParserException):
     pass
 
 
-class InvalidFile(Exception):
+class InvalidFile(ParserException):
     pass
 
 
-class InvalidFeature(Exception):
+class InvalidFeature(ParserException):
     pass

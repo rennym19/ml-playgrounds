@@ -49,7 +49,6 @@ const Home = (props) => {
       <Nav
         id="Navbar"
         showNavbarAddBtn={showNavbarAddBtn}
-        username={username}
         authService={props.authService}
         addDataset={toggleShowNavbarAddBtn}
         datasets={datasets}
@@ -57,7 +56,7 @@ const Home = (props) => {
         setSelectedDataset={setSelectedDataset} />
       <div id="Content" className={selectedDataset === undefined ? "unselected-dataset" : ""}>
         {
-          selectedDataset !== undefined
+          selectedDataset !== undefined && showNavbarAddBtn
             ? <Dataset
                 authService={props.authService}
                 selectedDataset={selectedDataset} />

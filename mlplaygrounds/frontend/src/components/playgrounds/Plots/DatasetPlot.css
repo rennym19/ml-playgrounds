@@ -16,15 +16,24 @@
   font-weight: bold;
 }
 
-#select-column-wrapper {
+#select-columns-wrapper {
   flex-grow: 1;
   text-align: right;
 }
 
-#select-column-wrapper button {
+#select-columns-wrapper .select-column-axis {
+  margin: 0 4px;
+  display: inline-block;
+}
+
+#select-columns-wrapper .select-column-axis span:first-of-type {
+  margin-right: 4px;
+}
+
+#select-columns-wrapper button {
   background-color: #332263;
 }
 
-#select-column-wrapper button span {
+#select-columns-wrapper button span {
   color: white;
 }
