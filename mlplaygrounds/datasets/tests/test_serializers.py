@@ -26,7 +26,8 @@ class TestDatasetSerializer(TestCase):
                                         num_records=1,
                                         features=['foo', 'bar'],
                                         original_format='csv',
-                                        not_assigned_pct=0)
+                                        not_assigned_pct=0,
+                                        problem_type="classification")
         
         self.expected_valid_instance_data = {
             'uid': None,
@@ -39,7 +40,8 @@ class TestDatasetSerializer(TestCase):
             'num_records': self.valid_instance.num_records,
             'features': self.valid_instance.features,
             'original_format': self.valid_instance.original_format,
-            'not_assigned_pct': self.valid_instance.not_assigned_pct
+            'not_assigned_pct': self.valid_instance.not_assigned_pct,
+            'problem_type': self.valid_instance.problem_type
         }
 
     def test_instance_serialization(self):
@@ -59,13 +61,16 @@ class TestDatasetSerializer(TestCase):
 
     def test_many_instances_serialization(self):
         instances = [ 
-            MockModel(uid=ObjectId(), name='A', user_id='u', data={'a': 'b'}),
-            MockModel(uid=ObjectId(), name='B', user_id='u', data={'a': 'b'})
+            MockModel(uid=ObjectId(), name='A', user_id='u',
+                      data={'a': 'b'}, problem_type='c'),
+            MockModel(uid=ObjectId(), name='B', user_id='u',
+                      data={'a': 'b'}, problem_type='r')
         ]
         expected_data = [
             {'uid': str(instance.uid),
              'name': instance.name,
-             'user_id': instance.user_id}
+             'user_id': instance.user_id,
+             'problem_type': instance.problem_type}
             for instance in instances
         ]
 
@@ -77,7 +82,8 @@ class TestDatasetSerializer(TestCase):
         data = {
             'name': 'Dataset',
             'user_id': 'testuser',
-            'data': {'foo': 'bar', 'inner': {'nested': True}}
+            'data': {'foo': 'bar', 'inner': {'nested': True}},
+            'problem_type': 'regression'
         }
 
         mocked_serializer = DatasetSerializer
@@ -103,7 +109,8 @@ class TestDatasetSerializer(TestCase):
         data = {
             'name': 'Dataset',
             'user_id': 'test_user',
-            'data': mock_data
+            'data': mock_data,
+            'problem_type': 'classification'
         }
         
         mocked_serializer = DatasetSerializer
@@ -117,6 +124,7 @@ class TestDatasetSerializer(TestCase):
         self.assertDictEqual({
             'name': dataset.name,
             'user_id': dataset.user_id,
+            'problem_type': dataset.problem_type,
             'data': dataset.data,
             'features': dataset.features,
             'label': dataset.label,
@@ -128,6 +136,7 @@ class TestDatasetSerializer(TestCase):
         }, {
             'name': data['name'],
             'user_id': data['user_id'],
+            'problem_type': data['problem_type'],
             'data': [{'foo': 'bar'}],
             'features': ['test_col1', 'test_col2'],
             'label': 'test_label_col',

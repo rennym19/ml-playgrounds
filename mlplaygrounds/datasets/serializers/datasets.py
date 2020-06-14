@@ -6,7 +6,8 @@ from bson.objectid import ObjectId
 
 from ..validators.datasets import (
     validate_dataset_name_type,
-    validate_dataset_name_length
+    validate_dataset_name_length,
+    validate_problem_type
 )
 from ..db.collections import Dataset
 from ..parsers.parser import ParsedDataset
@@ -23,6 +24,7 @@ class DatasetSerializer(serializers.Serializer):
         validate_dataset_name_type,
         validate_dataset_name_length
     ])
+    problem_type = serializers.CharField(required=True)
     data = serializers.DictField(allow_empty=True, required=False)
     index_col = serializers.CharField(read_only=True)
     features = serializers.ListField(read_only=True)
@@ -50,10 +52,15 @@ class DatasetSerializer(serializers.Serializer):
         else:
             representation['uid'] = None
 
-        if hasattr(instance, 'user_id') and instance.user_id is not None:
+        if hasattr(instance, 'user_id'):
             representation['user_id'] = instance.user_id
         else:
             representation['user_id'] = None
+
+        if hasattr(instance, 'problem_type'):
+            representation['problem_type'] = instance.problem_type
+        else:
+            representation['problem_type'] = None
         
         representation['name'] = instance.name
 
@@ -83,7 +90,8 @@ class DatasetSerializer(serializers.Serializer):
         internal_val = {
             'user_id': data.get('user_id', None),
             'name': data.get('name', None),
-            'data': parsed_data.get_data() if data_is_parsed else {}
+            'data': parsed_data.get_data() if data_is_parsed else {},
+            'problem_type': data.get('problem_type')
         }
 
         uid = data.get('uid', None)
@@ -107,6 +115,9 @@ class DatasetSerializer(serializers.Serializer):
             raise serializers.ValidationError(
                 f'You already have a dataset called {data["name"]}'
             )
+        
+        data['problem_type'] = validate_problem_type(data['problem_type'])
+
         return data
     
     def create(self):

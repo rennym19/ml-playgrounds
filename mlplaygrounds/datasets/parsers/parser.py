@@ -12,21 +12,29 @@ class DatasetParser:
     FILE_FORMATS = ['csv', 'json']
 
     def __init__(self, file, file_format, to_format,
-                 label=None, index_col=None):
+                 label=None, index_col=None, problem_type=None):
         self.file = file
         self.file_format = file_format
         self.to_format = to_format
         self.index_col = index_col
         self.label = label
+        self.problem_type = problem_type
     
     def parse(self):
-        if self.file_is_valid() and self.file_formats_are_valid():
+        if self.is_valid():
             df = self.read()
             data = self.write(df)
-            return ParsedDataset(data, df, self.label,
-                                 self.index_col, self.file_format)
+            return ParsedDataset(data, df, self.label, self.index_col,
+                                 self.file_format, self.problem_type)
         return None
     
+    def is_valid(self):
+        return all([
+            self.file_is_valid(), 
+            self.file_formats_are_valid(),
+            self.problem_type_is_valid()
+        ])
+
     def file_is_valid(self):
         if isinstance(self.file, (File, StringIO, str)):
             return True
@@ -43,6 +51,11 @@ class DatasetParser:
 
         return True
     
+    def problem_type_is_valid(self):
+        if self.problem_type is None:
+            raise ValueError('You must specify the problem type')
+        return True
+
     def read(self):
         try:
             if self.file_format == self.FILE_FORMATS[0]:
@@ -68,13 +81,14 @@ class DatasetParser:
 
 class ParsedDataset:
     def __init__(self, parsed_data, data=None, label=None,
-                 index_col=None, original_format=None):
+                 index_col=None, original_format=None, problem_type=None):
         self.parsed_data = parsed_data
         self.data = data
         self.label = label
         self.label_data = None
         self.index_col = index_col
         self.original_format = original_format
+        self.problem_type = problem_type
 
         if self.label is not None:
             if self._label_is_valid():
@@ -112,3 +126,40 @@ class ParsedDataset:
 
     def get_original_format(self):
         return self.original_format
+
+    def get_y_distribution(self):
+        if self.problem_type == 'regression':
+            return self._calculate_interval_distribution()
+        elif self.problem_type == 'classification':
+            return self._calculate_class_distribution()
+        
+        raise ValueError(f'{self.problem_type} is not a valid problem type')
+
+    def _calculate_interval_distribution(self):
+        bin_counts = pd.cut(self.label_data, bins=6).value_counts()
+        return self._y_counts(bin_counts)
+
+    def _calculate_class_distribution(self):
+        class_counts = self.label_data.value_counts()
+        return self._y_counts(class_counts)
+    
+    def _y_counts(self, value_counts):
+        """ 
+        Transforms value_counts into a three-element dict,
+        not only for simplicity purposes but also to ease plotting.
+
+        Two of the elements are the most common y values, 
+        the other is a sum of all other y values' counts.
+        """
+        counts = {}
+        others_count = 0
+        for i, (name, count) in enumerate(value_counts.to_dict().items()):
+            if i > 1:
+                others_count += count
+            else:
+                counts[str(name)] = count
+
+        if others_count > 0:
+            counts['others'] = others_count
+
+        return counts

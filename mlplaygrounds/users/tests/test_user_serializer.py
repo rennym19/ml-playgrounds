@@ -29,7 +29,8 @@ class TestUserSerializer(TestCase):
             'datasets': [{
                 'uid': user.datasets[0].uid,
                 'name': user.datasets[0].name,
-                'user_id': None
+                'user_id': None,
+                'problem_type': None
             }]
         }
 

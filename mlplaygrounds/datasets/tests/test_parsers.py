@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 
 from io import StringIO
 
@@ -31,7 +31,8 @@ class TestDatasetParser(TestCase):
         self.parser = DatasetParser(self.test_df_csv_buffer,
                                     file_format='csv',
                                     to_format='json',
-                                    label='large_city')
+                                    label='large_city',
+                                    problem_type='classification')
 
     def test_parse_from_file(self):
         self.dataset = self.parser.parse()
@@ -68,24 +69,25 @@ class TestDatasetParser(TestCase):
 class TestParsedDataset(TestCase):
     def setUp(self):
         self.test_df = pd.DataFrame({
-            'name': ['New York', 'Tokyo', 'Coro', 'Madrid'],
-            'population(m)': [8.4, 9.3, 0.2, None],
-            'large_city': [True, True, False, True]
-        }, index=[1, 2, 3, 4])
+            'name': ['New York', 'Tokyo', 'Coro', 'Madrid', 'Cefalu', 'Oslo'],
+            'population(m)': [8.4, 9.3, 0.2, None, 0.014, 0.68],
+            'city_class': ['lg', 'lg', 'sm', 'lg', 'sm', 'md']
+        }, index=[1, 2, 3, 4, 5, 6])
 
-        self.test_y = self.test_df['large_city'].copy().to_list()
+        self.test_y = self.test_df['city_class'].copy().to_list()
 
         self.parsed_dataset = ParsedDataset({},
                                             self.test_df,
-                                            label='large_city',
-                                            original_format='csv')
+                                            label='city_class',
+                                            original_format='csv',
+                                            problem_type='classification')
     
     def test_initialize_with_invalid_label(self):
         with self.assertRaises(InvalidFeature):
             ParsedDataset({}, self.test_df, 'price')
 
     def test_get_num_records(self):
-        self.assertEqual(self.parsed_dataset.get_num_records(), 4)
+        self.assertEqual(self.parsed_dataset.get_num_records(), 6)
 
     def test_get_features(self):
         self.assertListEqual(self.parsed_dataset.get_features(),
@@ -93,7 +95,7 @@ class TestParsedDataset(TestCase):
 
     def test_get_label(self):
         self.assertEqual(self.parsed_dataset.get_label(),
-                         'large_city')
+                         'city_class')
 
     def test_get_label_data(self):
         self.assertEqual(self.parsed_dataset.get_label_data(),
@@ -101,8 +103,19 @@ class TestParsedDataset(TestCase):
 
     def test_get_na_pct(self):
         self.assertAlmostEqual(self.parsed_dataset.get_not_assigned_pct(),
-                               12.5)
+                               8.33)
 
     def test_get_original_data_format(self):
         self.assertEqual(self.parsed_dataset.get_original_format(),
                          'csv')
+    
+    def test_get_class_distribution(self):
+        self.assertDictEqual(self.parsed_dataset.get_y_distribution(), {
+            'lg': 3,
+            'sm': 2,
+            'others': 1
+        })
+    
+    @patch('mlplaygrounds.datasets.parsers.parser.pd.cut')
+    def test_get_interval_distribution(self, mock_pd_cut):
+        pass

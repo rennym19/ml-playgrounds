@@ -7,7 +7,8 @@ from rest_framework.serializers import ValidationError
 from ..validators.datasets import (
     validate_dataset_name_type,
     validate_dataset_name_length,
-    validate_user_id
+    validate_user_id,
+    validate_problem_type
 )
 
 
@@ -36,3 +37,11 @@ class TestDatasetValidators(TestCase):
     def test_invalid_user_id(self):
         with self.assertRaises(ValidationError):
             validate_user_id(MockSet(), 'test_id')
+
+    def test_valid_problem_type(self):
+        self.assertEqual(
+            validate_problem_type('classification'), 'classification')
+    
+    def test_invalid_problem_type(self):
+        with self.assertRaises(ValidationError):
+            validate_problem_type('notvalid')

@@ -86,7 +86,8 @@ def parse_dataset(request):
     serializer = DatasetSerializer(data={
         'name': request.data.get('name', None),
         'data': parsed_dataset,
-        'user_id': request.user.username
+        'user_id': request.user.username,
+        'problem_type': request.data.get('problem_type', None)
     })
 
     if serializer.is_valid():

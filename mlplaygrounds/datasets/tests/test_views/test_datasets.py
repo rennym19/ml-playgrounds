@@ -13,7 +13,8 @@ class TestDatasetsViews(DatasetViewTestCase):
         expected_document = {
             'uid': str(self.dummy_data[0]['_id']),
             'name': self.dummy_data[0]['name'],
-            'user_id': self.dummy_data[0]['user_id']
+            'user_id': self.dummy_data[0]['user_id'],
+            'problem_type': self.dummy_data[0]['problem_type']
         }
         mock_data.return_value = [expected_document]
 

@@ -16,3 +16,9 @@ def validate_user_id(qs, user_id):
     if not qs.filter(username=user_id).exists():
         raise ValidationError('user_id should be a valid username')
     return user_id
+
+def validate_problem_type(problem_type):
+    if problem_type not in ['classification', 'regression']:
+        raise ValidationError(
+            'Only classification and regression problems are valid')
+    return problem_type

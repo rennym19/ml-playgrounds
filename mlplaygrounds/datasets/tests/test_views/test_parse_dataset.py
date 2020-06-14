@@ -47,7 +47,7 @@ class TestParseDataset(DatasetViewTestCase):
     
     @patch('mlplaygrounds.datasets.views.datasets.DatasetParser.parse')
     def test_parse_invalid_dataset(self, mock_parse):
-        mock_parse.side_effect = InvalidFile
+        mock_parse.side_effect = InvalidFile('error')
 
         response = self.client.post(self.url)
 

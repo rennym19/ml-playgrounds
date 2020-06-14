@@ -30,7 +30,8 @@ class DatasetViewTestCase(TestCase):
                 '_id': ObjectId(),
                 'name': 'First Dataset',
                 'user_id': 'john',
-                'data': {'foo': 'bar'}
+                'data': {'foo': 'bar'},
+                'problem_type': 'test'
             },
             {
                 '_id': ObjectId(),
