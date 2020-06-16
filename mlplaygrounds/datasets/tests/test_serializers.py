@@ -27,7 +27,8 @@ class TestDatasetSerializer(TestCase):
                                         features=['foo', 'bar'],
                                         original_format='csv',
                                         not_assigned_pct=0,
-                                        problem_type="classification")
+                                        problem_type="classification",
+                                        y_value_counts=[])
         
         self.expected_valid_instance_data = {
             'uid': None,
@@ -41,7 +42,8 @@ class TestDatasetSerializer(TestCase):
             'features': self.valid_instance.features,
             'original_format': self.valid_instance.original_format,
             'not_assigned_pct': self.valid_instance.not_assigned_pct,
-            'problem_type': self.valid_instance.problem_type
+            'problem_type': self.valid_instance.problem_type,
+            'y_value_counts': self.valid_instance.y_value_counts
         }
 
     def test_instance_serialization(self):
@@ -105,6 +107,7 @@ class TestDatasetSerializer(TestCase):
         mock_data.get_num_records.return_value = 3
         mock_data.get_original_format.return_value = 'format'
         mock_data.get_not_assigned_pct.return_value = 1
+        mock_data.get_y_value_counts.return_value = []
         
         data = {
             'name': 'Dataset',
@@ -132,7 +135,8 @@ class TestDatasetSerializer(TestCase):
             'index_col': dataset.index_col,
             'num_records': dataset.num_records,
             'original_format': dataset.original_format,
-            'not_assigned_pct': dataset.not_assigned_pct
+            'not_assigned_pct': dataset.not_assigned_pct,
+            'y_value_counts': dataset.y_value_counts
         }, {
             'name': data['name'],
             'user_id': data['user_id'],
@@ -144,7 +148,8 @@ class TestDatasetSerializer(TestCase):
             'index_col': 'test_id',
             'num_records': 3,
             'original_format': 'format',
-            'not_assigned_pct': 1
+            'not_assigned_pct': 1,
+            'y_value_counts': []
         })
 
 

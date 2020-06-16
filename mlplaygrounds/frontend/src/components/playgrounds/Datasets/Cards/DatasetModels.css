@@ -1,0 +1,19 @@
+#models-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#models-card #title {
+  text-transform: uppercase;
+  color: #323232;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+#models-card #models, #models-card #no-models {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

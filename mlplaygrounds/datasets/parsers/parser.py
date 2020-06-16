@@ -127,7 +127,7 @@ class ParsedDataset:
     def get_original_format(self):
         return self.original_format
 
-    def get_y_distribution(self):
+    def get_y_value_counts(self):
         if self.problem_type == 'regression':
             return self._calculate_interval_distribution()
         elif self.problem_type == 'classification':
@@ -143,7 +143,7 @@ class ParsedDataset:
         class_counts = self.label_data.value_counts()
         return self._y_counts(class_counts)
     
-    def _y_counts(self, value_counts):
+    def _y_counts(self, value_counts, by_interval=False):
         """ 
         Transforms value_counts into a three-element dict,
         not only for simplicity purposes but also to ease plotting.
@@ -151,15 +151,21 @@ class ParsedDataset:
         Two of the elements are the most common y values, 
         the other is a sum of all other y values' counts.
         """
-        counts = {}
+        counts = []
         others_count = 0
         for i, (name, count) in enumerate(value_counts.to_dict().items()):
             if i > 1:
                 others_count += count
             else:
-                counts[str(name)] = count
+                counts.append({
+                    'y': str(name),
+                    'count': count
+                })
 
         if others_count > 0:
-            counts['others'] = others_count
+            counts.append({
+                'y': 'others',
+                'count': others_count
+            })
 
         return counts

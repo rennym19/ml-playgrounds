@@ -74,7 +74,8 @@ def parse_dataset(request):
     parser = DatasetParser(request.data.get('data', None),
                            file_format='csv',
                            to_format='json',
-                           label=label if label != '' else None)
+                           label=label if label != '' else None,
+                           problem_type=request.data.get('problem_type', None))
 
     try:
         parsed_dataset = parser.parse()

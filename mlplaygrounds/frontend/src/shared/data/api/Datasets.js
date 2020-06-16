@@ -64,7 +64,8 @@ class DatasetsAPIService {
   static buildMultipartData(dataset) {
     const formData = new FormData();
     formData.append('name', dataset.name);
-    formData.append('label', dataset.label)
+    formData.append('label', dataset.label);
+    formData.append('problem_type', dataset.problemType);
     formData.append('data', dataset.data);
     return formData;
   }

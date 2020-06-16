@@ -1,5 +1,5 @@
-import React, { Component } from 'react'
-import { Card } from '@blueprintjs/core';
+import React, { useState } from 'react'
+import { Card, RadioGroup, Radio } from '@blueprintjs/core';
 import { Button, FormGroup, InputGroup, FileInput } from '@blueprintjs/core'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -20,46 +20,30 @@ const getFileName = (fullPath) => {
   }
 };
 
-class DatasetForm extends Component {
-  constructor(props) {
-    super(props)
+const DatasetForm = (props) => {
+  const [name, setName] = useState('');
+  const [data, setData] = useState(undefined);
+  const [datasetFilename, setDatasetFilename] = useState(undefined);
+  const [label, setLabel] = useState('');
+  const [problemType, setProblemType] = useState(undefined);
 
-    this.state = {
-      'name': '',
-      'data': undefined,
-      'datasetFileName': undefined,
-      'label': ''
-    }
+  const onChangeName = e => setName(e.target.value);
 
-    this.onChangeName = this.onChangeName.bind(this)
-    this.onChangeDataFile = this.onChangeDataFile.bind(this)
-    this.onChangeLabel = this.onChangeLabel.bind(this)
-    this.validate = this.validate.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this)
-  }
+  const onChangeDataFile = e => {
+    setData(e.target.files[0]);
+    setDatasetFilename(getFileName(e.target.value));
+  };
 
-  onChangeName(event) {
-    this.setState({'name': event.target.value})
-  }
+  const onChangeLabel = e => setLabel(e.target.value);
 
-  onChangeDataFile(event) {
-    this.setState({
-      'data': event.target.files[0],
-      'datasetFileName': getFileName(event.target.value)
-    });
-  }
+  const onChangeProblemType = e => setProblemType(e.target.value);
 
-  onChangeLabel(event) {
-    this.setState({
-      'label': event.target.value
-    });
-  }
-
-  validate() {
+  const validate = () => {
     const validator = new DatasetValidator({
-      name: this.state.name,
-      data: this.state.data,
-      label: this.state.label
+      name: name,
+      data: data,
+      label: label,
+      problemType: problemType
     });
 
     if (!validator.isValid()) {
@@ -67,82 +51,94 @@ class DatasetForm extends Component {
       return false;
     }
     return true;
-  }
+  };
 
-  handleSubmit() {
-    if (this.validate())
+  const handleSubmit = () => {
+    if (validate())
       DatasetsAPIService.addDataset(
-        this.props.token,
-        { name: this.state.name, label: this.state.label, data: this.state.data },
-        () => {
-          this.setState({
-            'name': '',
-            'data': undefined,
-            'datasetFileName': undefined,
-            'label': ''
-          });
-        }
+        props.token,
+        {
+          name: name,
+          label: label,
+          problemType: problemType,
+          data: data
+        },
+        clearState
       );
-  }
+  };
 
-  render() {
-    return (
-      <Card id="add-dataset-card">
-        <div className="form-wrapper">
-          <div id="form-header">
-            <h1>Add Dataset</h1>
-            <span id="close-button-wrapper">
-              <FontAwesomeIcon
-                id="close-button"
-                icon={faTimes}
-                size="lg"
-                onClick={() => this.props.toggleShowNavbarAddBtn()}/>
-            </span>
-          </div>
-          <FormGroup
-            label="Dataset Name"
-            labelFor="name-input">      
-            <InputGroup
-              id="name-input"
-              placeholder="Enter dataset name"
-              type="text"
-              fill={true}
-              value={this.state.name}
-              onChange={this.onChangeName} />
-          </FormGroup>
-          <FormGroup
-            label="Data File"
-            labelFor="data-file-input">
-            <FileInput
-              id="data-file-input"
-              fill={true}
-              placeholder="Choose dataset file..."
-              text={this.state.datasetFileName}
-              onInputChange={this.onChangeDataFile} />
-          </FormGroup>
-          <FormGroup
-            label="Label Name"
-            labelFor="label-input">      
-            <InputGroup
-              id="label-input"
-              placeholder="Enter label name (optional)"
-              type="text"
-              fill={true}
-              value={this.state.label}
-              onChange={this.onChangeLabel} />
-          </FormGroup>
+  const clearState = () => {
+    setName('');
+    setData(undefined);
+    setDatasetFilename(undefined);
+    setLabel('');
+    setProblemType(undefined);
+  };
+
+  return (
+    <Card id="add-dataset-card">
+      <div className="form-wrapper">
+        <div id="form-header">
+          <h1>Add Dataset</h1>
+          <span id="close-button-wrapper">
+            <FontAwesomeIcon
+              id="close-button"
+              icon={faTimes}
+              size="lg"
+              onClick={() => props.toggleShowNavbarAddBtn()}/>
+          </span>
         </div>
-        <Button
-          id="submit-btn"
-          minimal={true}
-          outlined={true}
-          fill={true}
-          type="submit" 
-          onClick={this.handleSubmit}
-          text="Add" />
-      </Card>
-    )
-  }
-}
+        <FormGroup
+          label="Dataset Name"
+          labelFor="name-input">      
+          <InputGroup
+            id="name-input"
+            placeholder="Enter dataset name"
+            type="text"
+            fill={true}
+            value={name}
+            onChange={onChangeName} />
+        </FormGroup>
+        <FormGroup
+          label="Data File"
+          labelFor="data-file-input">
+          <FileInput
+            id="data-file-input"
+            fill={true}
+            placeholder="Choose dataset file..."
+            text={datasetFilename}
+            onInputChange={onChangeDataFile} />
+        </FormGroup>
+        <FormGroup
+          label="Label Name"
+          labelFor="label-input">      
+          <InputGroup
+            id="label-input"
+            placeholder="Enter label name"
+            type="text"
+            fill={true}
+            value={label}
+            onChange={onChangeLabel} />
+        </FormGroup>
+        <RadioGroup
+          label="Problem Type"
+          onChange={onChangeProblemType}
+          selectedValue={problemType}
+          inline={true}>
+            <Radio label="Regression" value="regression" className="radio-item" />
+            <Radio label="Classification" value="classification" className="radio-item" />
+        </RadioGroup>
+      </div>
+      <Button
+        id="submit-btn"
+        minimal={true}
+        outlined={true}
+        fill={true}
+        type="submit" 
+        onClick={handleSubmit}
+        text="Add" />
+    </Card>
+  )
+};
 
-export default DatasetForm
+export default DatasetForm;

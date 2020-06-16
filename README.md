@@ -1,5 +1,5 @@
 # ml-playgrounds
-> Allows to upload and/or parse your datasets so that you can apply multiple Data Science, Statistics and Machine Learning techiques without having to write any code!
+> Allows to upload and parse your datasets so that you can apply multiple Data Science, Statistics and Machine Learning techiques without having to write any code!
 
 > Python, Django, Rest API, MongoDB, React, Data Science, Machine Learning
 
@@ -8,7 +8,8 @@ Soon
 
 ## What does it look like?
 <p align="center">
-  <img src="https://raw.githubusercontent.com/rennym19/ml-playgrounds/master/docs/img/user-register.png" width="600px" alt="Signup page"/>
+  <img src="https://user-images.githubusercontent.com/18429626/84722135-5ebe5d80-af50-11ea-8b65-9e1b8a04ee33.png" width="600px" alt="Signup page"/>
+  <img src="https://user-images.githubusercontent.com/18429626/84722134-5d8d3080-af50-11ea-9612-a98681f96fb0.png" width="600px" alt="Home page"/>
 <p/>
 
 <hr/>

@@ -53,3 +53,7 @@
   border-radius: 0 0 3px 3px;
   border-color: rgba(255,255,255,0);
 }
+
+label.bp3-control {
+  color: white;
+}

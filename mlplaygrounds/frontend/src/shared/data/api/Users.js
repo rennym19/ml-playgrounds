@@ -63,11 +63,9 @@ class UsersAPIService {
       result => {
         if (result.status === 200) {
           success(result.body);
-        } else if (result.status === 401) {
-          logoutHandler();
         } else {
-          notifyErrors(result.body);
-        } 
+          logoutHandler();
+        }
       }
     );
   }

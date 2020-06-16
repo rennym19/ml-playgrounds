@@ -4,7 +4,7 @@
 
   display: grid;
   grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: 120px auto auto;
+  grid-template-rows: 120px 300px 300px;
   grid-column-gap: 1em;
   grid-row-gap: 1em;
 }
@@ -42,12 +42,12 @@
   grid-row: 2/4;
 }
 
-#dataset-data {
+#dataset-label-distribution {
   grid-column: 9/13;
   grid-row: 2;
 }
 
-#dataset-description {
+#dataset-models {
   grid-column: 9/13;
   grid-row: 3;
 }

@@ -109,13 +109,13 @@ class TestParsedDataset(TestCase):
         self.assertEqual(self.parsed_dataset.get_original_format(),
                          'csv')
     
-    def test_get_class_distribution(self):
-        self.assertDictEqual(self.parsed_dataset.get_y_distribution(), {
-            'lg': 3,
-            'sm': 2,
-            'others': 1
-        })
+    def test_get_class_counts(self):
+        self.assertListEqual(self.parsed_dataset.get_y_value_counts(), [
+            {'y': 'lg', 'count': 3},
+            {'y': 'sm', 'count': 2},
+            {'y': 'others', 'count': 1}
+        ])
     
     @patch('mlplaygrounds.datasets.parsers.parser.pd.cut')
-    def test_get_interval_distribution(self, mock_pd_cut):
+    def test_get_interval_counts(self, mock_pd_cut):
         pass

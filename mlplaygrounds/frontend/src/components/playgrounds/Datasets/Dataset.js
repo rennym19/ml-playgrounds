@@ -4,7 +4,7 @@ import { faListOl, faColumns, faPercentage } from '@fortawesome/free-solid-svg-i
 
 import DatasetsAPIService from '../../../shared/data/api/Datasets';
 import DatasetInfo from './Cards/DatasetInfo';
-import DatasetDescription from './Cards/DatasetDescription';
+import DatasetModels from './Cards/DatasetModels';
 import DatasetPlot from '../Plots/DatasetPlot';
 import LabelDistribution from './Plots/LabelDistribution';
 import UserWelcomeCard from '../Users/UserWelcomeCard';
@@ -53,18 +53,24 @@ const Dataset = (props) => {
             <DatasetPlot
               title={dataset.name}
               label={dataset.label}
+              problem_type={dataset.problem_type}
+	            data={dataset.data}
+	            label_data={dataset.label_data}
               columns={
                 dataset.features !== undefined && dataset.label !== undefined
                   ? dataset.features.concat([dataset.label])
                   : dataset.features
               }/>
           </div>
-          <div id="dataset-data">
+          <div id="dataset-label-distribution">
             <LabelDistribution
-              label={dataset.label} />
+              label={dataset.label}
+              problem_type={dataset.problem_type}
+              y_value_counts={dataset.y_value_counts} />
           </div>
-          <div id="dataset-description">
-            <DatasetDescription />
+          <div id="dataset-models">
+            <DatasetModels 
+              models={[]}/>
           </div>
         </div>
       : <div id="loading">
