@@ -79,19 +79,11 @@ class TestCollectionManager(TestCase):
                                    cast_into_cls=Mock)
         self.assertEqual(res.username, 'jack')
 
-
-class TestDatasetManager(TestCase):
-    def setUp(self):
-        self.manager = MockDatasetManager()
-
     def test_save(self):
-        dataset = Dataset()
-        dataset.name = 'Dataset'
-        dataset.user_id = 'john'
-        dataset.data = {'a': 'b'}
+        mock_dataset = Dataset()
+        mock_dataset.foo = 'bar'
 
-        saved = self.manager.save(dataset)
-        
-        self.assertEqual([dataset.name, dataset.user_id, dataset.data],
-                         [saved.name, saved.user_id, saved.data])
-        self.assertIsNotNone(saved.uid)
+        res = self.manager.save(mock_dataset)
+
+        self.assertEqual(res.foo, 'bar')
+        self.assertIsNotNone(res.uid)

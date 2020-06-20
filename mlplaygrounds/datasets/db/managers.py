@@ -56,11 +56,16 @@ class CollectionManager:
             return cast_document(cast_into_cls, doc, many=many)
         return doc
 
+    def save(self, obj):
+        obj.uid = self.insert(obj.__dict__)
+        return obj
+
 
 class DatasetManager(CollectionManager):
     def __init__(self, collection_name):
         super().__init__(DATABASE_SETTINGS['NAME'], collection_name)
-    
-    def save(self, dataset):
-        dataset.uid = self.insert(dataset.__dict__)
-        return dataset
+
+
+class MLModelManager(CollectionManager):
+    def __init__(self, collection_name):
+        super().__init__(DATABASE_SETTINGS['NAME'], collection_name)

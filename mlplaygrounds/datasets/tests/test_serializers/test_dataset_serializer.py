@@ -7,12 +7,12 @@ from bson import ObjectId
 
 from django.contrib.auth import get_user_model
 
-from rest_framework import serializers
+from rest_framework.serializers import ValidationError
 
-from ..db.collections import Dataset
-from ..parsers.parser import ParsedDataset
-from ..serializers.datasets import DatasetSerializer
-from .mocks.managers import MockDatasetManager
+from mlplaygrounds.datasets.db.collections import Dataset
+from mlplaygrounds.datasets.parsers.parser import ParsedDataset
+from mlplaygrounds.datasets.serializers.datasets import DatasetSerializer
+from ..mocks.managers import MockDatasetManager
 
 
 class TestDatasetSerializer(TestCase):
@@ -170,7 +170,7 @@ class TestDatasetSerializer(TestCase):
         
         serializer = DatasetSerializer(data=invalid_data)
 
-        with self.assertRaises(serializers.ValidationError):
+        with self.assertRaises(ValidationError):
             serializer.is_valid(raise_exception=True)
 
     def test_save_valid_instance(self):

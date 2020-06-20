@@ -1,5 +1,3 @@
-from django.contrib.auth import get_user_model
-
 from rest_framework import serializers
 
 from bson.objectid import ObjectId
@@ -12,14 +10,10 @@ from ..validators.datasets import (
 from ..db.collections import Dataset
 from ..parsers.parser import ParsedDataset
 
-User = get_user_model()
-
 
 class DatasetSerializer(serializers.Serializer):
     uid = serializers.CharField(read_only=True)
-    user_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), required=True
-    )
+    user_id = serializers.CharField(required=True)
     name = serializers.CharField(required=True, validators=[
         validate_dataset_name_type,
         validate_dataset_name_length
