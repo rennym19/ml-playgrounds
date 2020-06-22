@@ -10,7 +10,10 @@ class Collection:
                               'Got {cls.__class__.__name__}')
         obj = cls()
         for field, val in kwargs.items():
-            setattr(obj, field, val)
+            if field == '_id':
+                setattr(obj, 'uid', val)
+            else:
+                setattr(obj, field, val)
         return obj
 
 

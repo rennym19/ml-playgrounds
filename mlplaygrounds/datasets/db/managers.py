@@ -33,12 +33,12 @@ class CollectionManager:
     def insert(self, data={}):
         return self.collection.insert_one(data).inserted_id
 
-    def update(self, filter_by, update_fields, cast_into_cls=None):
+    def update(self, filter_by, update_fields):
         result = self.collection.update_one(filter_by,
                                             {'$inc': update_fields})
         return result.modified_count
 
-    def update_many(self, filter_by, update_fields, cast_into_cls=None):
+    def update_many(self, filter_by, update_fields):
         result = self.collection.update_many(filter_by,
                                              {'$inc': update_fields})
         return result.modified_count

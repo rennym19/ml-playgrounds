@@ -8,6 +8,7 @@ from rest_framework.serializers import ValidationError
 from bson import ObjectId
 
 from mlplaygrounds.datasets.serializers.models import MLModelSerializer
+from mlplaygrounds.datasets.db.collections import MLModel
 
 
 class TestMLModelSerializer(TestCase):
@@ -97,6 +98,27 @@ class TestMLModelSerializer(TestCase):
         if serializer.is_valid():
             instance = serializer.create()
             self.assertDictEqual(instance.__dict__, self.data)
+    
+    @patch('mlplaygrounds.datasets.serializers.models.MLModel.objects.update')
+    def test_update(self, mock_update):
+        mock_update.return_value = 1
+        model = MLModel.create(algorithm='SVM', user_id='john', dataset_id=1)
+        
+        serializer = MLModelSerializer()
+        model = serializer.update(model, {'algorithm': 'NN', 'dataset_id': 2})
+
+        self.assertListEqual(
+            [model.algorithm, model.dataset_id, model.user_id],
+            ['NN', 2, 'john']
+        )
+
+    def test_update_field(self):
+        model = MockModel(algorithm='NN')
+
+        serializer = MLModelSerializer(model)
+        serializer.update_field(model, 'algorithm', 'Logistic Regression')
+
+        self.assertEqual(model.algorithm, 'Logistic Regression')
 
     @patch('mlplaygrounds.datasets.serializers.models.MLModel.objects.save') 
     @patch('mlplaygrounds.datasets.serializers.models.isinstance')

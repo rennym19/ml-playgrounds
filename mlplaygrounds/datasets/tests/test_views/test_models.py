@@ -1,12 +1,16 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock
 
+from django.core.exceptions import SuspiciousOperation
+from django.http import Http404
 from django.urls import reverse
 
 from rest_framework import status
 
 from bson import ObjectId
 
+from mlplaygrounds.datasets.db.collections import MLModel
+from mlplaygrounds.datasets.views.models import ModelDetail
 from .testcases import ModelViewTestCase
 
 
@@ -47,11 +51,32 @@ class TestModels(ModelViewTestCase):
         response = self.client.get(self.url, {'dataset_id': '1234'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-    def test_post_valid_model(self):
-        pass
+    @patch('mlplaygrounds.datasets.views.models.MLModelSerializer.create')
+    @patch('mlplaygrounds.datasets.views.models.MLModelSerializer.is_valid')
+    def test_post_valid_model(self, mock_is_valid, mock_create):
+        expected = {
+            'name': 'model',
+            'algorithm': 'ml algorithm',
+            'user_id': 'test_user',
+            'dataset_id': 'test_dataset'
+        }
+        mock_is_valid.return_value = True
+        mock_create.return_value = MLModel.create(**expected)
 
-    def test_post_invalid_model(self):
-        pass
+        response = self.client.post(self.url, expected, format='json')
+        
+        del response.data['uid']
+        self.assertDictEqual(response.data, expected)
+
+    @patch('mlplaygrounds.datasets.views.models.MLModelSerializer.errors',
+           new_callable=PropertyMock(return_value=['Invalid Data']))
+    @patch('mlplaygrounds.datasets.views.models.MLModelSerializer.is_valid')
+    def test_post_invalid_model(self, mock_is_valid, mock_errors):
+        mock_is_valid.return_value = False
+
+        response = self.client.post(self.url, {}, format='json')
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class TestModelDetail(ModelViewTestCase):
@@ -59,8 +84,62 @@ class TestModelDetail(ModelViewTestCase):
         super().setUp()
         self.url = reverse('datasets:model-detail', args=['id'])
 
-    def test_get_model(self):
-        pass
+    def test_get_document(self):
+        model_id = self.dummy_data[0]['_id']
+        user_id = self.dummy_data[0]['user_id']
 
-    def test_get_invalid_model(self):
-        pass
+        model_detail_view = ModelDetail()
+        document = model_detail_view.get_document(model_id, user_id)
+
+        self.assertEqual(document, self.dummy_data[0])
+
+    def test_get_non_existant_document(self):
+        model_detail_view = ModelDetail()
+
+        with self.assertRaises(Http404):
+            model_detail_view.get_document('1234', 'fakeuser')
+
+    @patch('mlplaygrounds.datasets.views.models.ModelDetail.get_document')
+    @patch('mlplaygrounds.datasets.views.models.ObjectId')
+    def test_get_object(self, mock_id, mock_document):
+        mock_document.return_value = self.dummy_data[2]
+
+        model_detail_view = ModelDetail()
+        model = model_detail_view.get_object('model_id', 'user_id')
+
+        self.assertEqual(str(model.uid), str(self.dummy_data[2]['_id']))
+    
+    def test_get_object_invalid_id(self):
+        model_detail_view = ModelDetail()
+
+        with self.assertRaises(SuspiciousOperation):
+            model_detail_view.get_object('model_id', 'user_id')
+
+    @patch('mlplaygrounds.datasets.views.models.ModelDetail.get_document')
+    @patch('mlplaygrounds.datasets.views.models.ObjectId')
+    def test_get_model(self, mock_id, mock_document):
+        mock_document.return_value = self.dummy_data[0]
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @patch('mlplaygrounds.datasets.views.models.MLModelSerializer.update')
+    @patch('mlplaygrounds.datasets.views.models.ModelDetail.get_document')
+    @patch('mlplaygrounds.datasets.views.models.ObjectId')
+    def test_patch_model(self, mock_id, mock_document, mock_update):
+        mock_document.return_value = self.dummy_data[0]
+        mock_update.return_value = MLModel.create(**self.dummy_data[0])
+
+        response = self.client.patch(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    @patch('mlplaygrounds.datasets.views.models.ModelDetail.get_document')
+    @patch('mlplaygrounds.datasets.views.models.ObjectId')
+    def test_delete_model(self, mock_id, mock_document):
+        mock_document.return_value = self.dummy_data[2]
+
+        response = self.client.delete(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)

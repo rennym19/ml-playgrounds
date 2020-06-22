@@ -36,6 +36,21 @@ class MLModelSerializer(serializers.Serializer):
     def create(self):
         return MLModel.create(**self.validated_data)
     
+    def update(self, instance, validated_data):
+        if instance:
+            for field, val in validated_data.items():
+                self.update_field(instance, field, val)
+            updated = MLModel.objects.update({'_id': instance.uid},
+                                             validated_data)
+            if updated:
+                return instance
+            raise ValueError('Instance could not be updated.'
+                             'It probably does not exist')
+        raise ValueError('Could not update: instance needed')
+
+    def update_field(self, instance, field, val):
+        setattr(instance, field, val)
+        
     def save(self, model):
         if not isinstance(model, MLModel):
             raise TypeError('model must be of type MLModel')
