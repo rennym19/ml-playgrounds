@@ -41,6 +41,8 @@ class Register(APIView):
             user = serializer.create(serializer.validated_data)
             if user is not None:
                 token = serializer.login(user)
-                return Response({'user': UserSerializer(user).data,
-                                 'token': token}, status=status.HTTP_200_OK)
+                return Response({
+                    'user': UserSerializer(user).data,
+                    'token': token
+                }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

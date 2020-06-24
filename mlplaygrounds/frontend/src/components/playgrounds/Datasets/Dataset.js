@@ -3,6 +3,7 @@ import { Spinner } from '@blueprintjs/core';
 import { faListOl, faColumns, faPercentage } from '@fortawesome/free-solid-svg-icons';
 
 import DatasetsAPIService from '../../../shared/data/api/Datasets';
+import ModelsAPIService from '../../../shared/data/api/Models';
 import DatasetInfo from './Cards/DatasetInfo';
 import DatasetModels from './Cards/DatasetModels';
 import DatasetPlot from './Plots/DatasetPlot';
@@ -12,17 +13,36 @@ import './Dataset.css';
 
 const Dataset = (props) => {
   const [dataset, setDataset] = useState(undefined);
+  const [models, setModels] = useState(undefined);
 
   useEffect(() => {
     getDataset();
   }, [props.selectedDataset]);
 
   const getDataset = () => {
+    const datasetId = props.selectedDataset.uid;
+    const userToken = props.authService.token;
+
     DatasetsAPIService.getDataset(
-      props.selectedDataset.uid,
-      props.authService.token,
-      (res) => { setDataset(res); }
+      datasetId,
+      userToken,
+      (res) => {
+        setDataset(res);
+        if (models !== undefined) {
+          setModels(undefined);
+        }
+
+        ModelsAPIService.getModels(
+          userToken,
+          datasetId,
+          (res) => { setModels(res); }
+        );
+      }
     );
+  }
+
+  const getModels = () => {
+
   }
 
   return (

@@ -11,7 +11,8 @@ const NoDatasets = (props) => {
         ? <NoDatasetsCard toggleShowNavbarAddBtn={props.toggleShowNavbarAddBtn} />
         : <DatasetForm
             token={props.authService.token}
-            toggleShowNavbarAddBtn={props.toggleShowNavbarAddBtn} />
+            toggleShowNavbarAddBtn={props.toggleShowNavbarAddBtn}
+            addToDatasets={props.addToDatasets} />
     }
     </>
   );

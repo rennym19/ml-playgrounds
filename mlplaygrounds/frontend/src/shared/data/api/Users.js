@@ -1,73 +1,24 @@
+import APIService from './APIService';
 import { notify, notifyErrors } from '../../notifications/Notifier'
 
-class UsersAPIService {  
+class UsersAPIService extends APIService {
   static registerUser(user, success) {
-    fetch('users/register/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: user.username,
-        password: user.password,
-      })
-    })
-    .then(res => res.json().then(data => ({status: res.status, body: data})))
-    .then(result => {
-      if (result.status === 200)
-        success(result);
-      else
-        notifyErrors(result.body);
-    });
+    this.create('users/register/', null, JSON.stringify(user), true, success);
   }
   
   static loginUser(user, success) {
-    fetch('users/login/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: user.username,
-        password: user.password,
-      })
-    })
-    .then(res => res.json().then(data => ({status: res.status, body: data})))
-    .then(result => {
-      if (result.status === 200)
-        success(result);
-      else
-        notifyErrors(result.body);
-    });
+    this.post('users/login/', null, JSON.stringify(user), true, 200, success);
   }
   
   static logoutUser(token, success) {
     if (token === undefined)
       notify('Error', 'Were you logged in?', 'danger');
-
-    fetch('users/logout/', {
-      method: 'POST',
-      headers: { 'Authorization': `Token ${token}` }
-    })
-    .then(res => {
-      if (res.status == 204) {
-        success();
-      } else {
-        console.log('Error while logging out... Were you logged in?');
-      }
-    });
+    else
+      this.post('users/logout/', token, undefined, false, 204, success);
   }
 
   static retrieveUserProfile(token, success, logoutHandler) {
-    fetch('users/profile/', {
-      headers: { 'Authorization': `Token ${token}` }
-    })
-    .then(res => res.json().then(data => ({status: res.status, body: data})))
-    .then(
-      result => {
-        if (result.status === 200) {
-          success(result.body);
-        } else {
-          logoutHandler();
-        }
-      }
-    );
+    this.get('users/profile/', token, success, logoutHandler);
   }
 }
 

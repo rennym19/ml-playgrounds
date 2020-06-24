@@ -1,64 +1,28 @@
-import { notify, notifyErrors } from '../../notifications/Notifier';
+import APIService from './APIService';
+import { notify } from '../../notifications/Notifier';
 
-class DatasetsAPIService {
+class DatasetsAPIService extends APIService{
   static getDatasets(token, success, error=undefined) {
-    fetch('data/datasets/', {
-      method: 'GET',
-      headers: { 'Authorization': `Token ${token}` }
-    })
-    .then(res => res.json().then(data => ({status: res.status, body: data})))
-    .then(result => {
-      if (result.status === 200) {
-        success(result.body);
-      } else {
-        notifyErrors(result.body);
-
-        if (error !== undefined)
-          error();
-      }
-    });
+    this.list('data/datasets/', token, success, error);
   }
 
   static getDataset(uid, token, success, error=undefined) {
-    fetch(`data/datasets/${uid}/`, {
-      method: 'GET',
-      headers: { 'Authorization': `Token ${token}`}
-    })
-    .then(res => res.json().then(data => ({status: res.status, body: data})))
-    .then(result => {
-      if (result.status === 200) {
-        success(result.body);
-      } else {
-        notifyErrors(result.body);
-
-        if (error !== undefined)
-          error();
-      }
-    });
+    this.get(`data/datasets/${uid}/`, token, success, error);
   }
 
   static addDataset(token, dataset, success=undefined, error=undefined) {
-    fetch('data/parse_dataset/', {
-      method: 'POST',
-      body: DatasetsAPIService.buildMultipartData(dataset),
-      headers: { 'Authorization': `Token ${token}` }
-    })
-    .then(res => res.json().then(data => ({status: res.status, body: data})))
-    .then(result => {
-      if (result.status === 201) {
-        notify('Congrats!',
-               `The dataset "${dataset.name}" has been added succesfully.`,
-               'success');
-        
-        if (success !== undefined)
-          success();
-      } else {
-        notifyErrors(result.body);
+    const requestBody = DatasetsAPIService.buildMultipartData(dataset);
 
-        if (error !== undefined)
-          error();
-      }
-    });
+    const handleSuccess = (res) => {
+      notify(
+        'Congrats!',
+        `The dataset "${dataset.name}" has been added succesfully.`,
+        'success'
+      );
+      if (success !== undefined) { success(res); }
+    }
+
+    this.create('data/parse_dataset/', token, requestBody, false, handleSuccess, error );
   }
 
   static buildMultipartData(dataset) {

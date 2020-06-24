@@ -1,130 +1,101 @@
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import { Button, FormGroup, InputGroup } from "@blueprintjs/core"
 
-class RegisterForm extends Component {
-  constructor(props) {
-    super(props)
+const RegisterForm = (props) => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
 
-    this.state = {
-      username: '',
-      password: '',
-      email: '',
-      firstName: '',
-      lastName: ''
-    }
+  const handleUsernameChange = (e) => setUsername(e.target.value);
+  const handlePasswordChange = (e) => setPassword(e.target.value);
+  const handleEmailChange = (e) => setEmail(e.target.value);
+  const handleFirstNameChange = (e) => setFirstName(e.target.value);
+  const handleLastNameChange = (e) => setLastName(e.target.value);
 
-    this.handleUsernameChange = this.handleUsernameChange.bind(this)
-    this.handlePasswordChange = this.handlePasswordChange.bind(this)
-    this.handleEmailChange = this.handleEmailChange.bind(this)
-    this.handleFirstNameChange = this.handleFirstNameChange.bind(this)
-    this.handleLastNameChange = this.handleLastNameChange.bind(this)
-    this.handleSubmit = this.handleSubmit.bind(this)
-  }
-
-  handleUsernameChange(event) {
-    this.setState({username: event.target.value})
-  }
-
-  handlePasswordChange(event) {
-    this.setState({password: event.target.value})
-  }
-
-  handleEmailChange(event) {
-    this.setState({email: event.target.value})
-  }
-
-  handleFirstNameChange(event) {
-    this.setState({firstName: event.target.value})
-  }
-
-  handleLastNameChange(event) {
-    this.setState({lastName: event.target.value})
-  }
-
-  handleSubmit() {
-    this.props.authService({
-      username: this.state.username,
-      password: this.state.password,
-      email: this.state.email,
-      firstName: this.state.firstName,
-      lastName: this.state.lastName
+  const handleSubmit = () => {
+    props.authService.register({
+      username: username,
+      password: password,
+      email: email,
+      first_name: firstName,
+      last_name: lastName
     });
-  }
+  };
 
-  render() {
-    return (
-      <div>
-        <h1>Register</h1>
-        <p>Already have an account? 
-          <a href="#" onClick={this.props.toggleLogin}> Log in.</a>
-        </p>
-        <FormGroup
-          label="Username"
-          labelFor="username-input">      
-          <InputGroup
-            id="username-input"
-            placeholder="Enter username"
-            type="text"
-            value={this.state.username}
-            onChange={this.handleUsernameChange} />
-        </FormGroup>
+  return (
+    <div>
+      <h1>Register</h1>
+      <p>Already have an account? 
+        <a href="#" onClick={props.toggleLogin}> Log in.</a>
+      </p>
+      <FormGroup
+        label="Username"
+        labelFor="username-input">      
+        <InputGroup
+          id="username-input"
+          placeholder="Enter username"
+          type="text"
+          value={username}
+          onChange={handleUsernameChange} />
+      </FormGroup>
 
-        <FormGroup
-          label="Password"
-          labelFor="password-input">
-          <InputGroup
-            id="password-input"
-            placeholder="Enter password"
-            type="password"
-            value={this.state.password}
-            onChange={this.handlePasswordChange} />
-        </FormGroup>
+      <FormGroup
+        label="Password"
+        labelFor="password-input">
+        <InputGroup
+          id="password-input"
+          placeholder="Enter password"
+          type="password"
+          value={password}
+          onChange={handlePasswordChange} />
+      </FormGroup>
 
-        <FormGroup
-          label="Email"
-          labelFor="email-input">      
-          <InputGroup
-            id="email-input"
-            placeholder="your@email.com"
-            type="email"
-            value={this.state.email}
-            onChange={this.handleEmailChange} />
-        </FormGroup>
+      <FormGroup
+        label="Email"
+        labelFor="email-input">      
+        <InputGroup
+          id="email-input"
+          placeholder="your@email.com"
+          type="email"
+          value={email}
+          onChange={handleEmailChange} />
+      </FormGroup>
 
-        <FormGroup
-          label="First Name"
-          labelFor="first-name-input">      
-          <InputGroup
-            id="first-name-input"
-            placeholder="Enter your first name"
-            type="text"
-            value={this.state.firstName}
-            onChange={this.handleFirstNameChange} />
-        </FormGroup>
+      <FormGroup
+        label="First Name"
+        labelFor="first-name-input">      
+        <InputGroup
+          id="first-name-input"
+          placeholder="Enter your first name"
+          type="text"
+          value={firstName}
+          onChange={handleFirstNameChange} />
+      </FormGroup>
 
-        <FormGroup
-          label="Last Name"
-          labelFor="last-name-input">      
-          <InputGroup
-            id="last-name-input"
-            placeholder="Enter your last name"
-            type="text"
-            value={this.state.lastName}
-            onChange={this.handleLastNameChange} />
-        </FormGroup>
+      <FormGroup
+        label="Last Name"
+        labelFor="last-name-input">      
+        <InputGroup
+          id="last-name-input"
+          placeholder="Enter your last name"
+          type="text"
+          value={lastName}
+          onChange={handleLastNameChange} />
+      </FormGroup>
 
-        <Button
-          id="submit-btn"
-          large={true}
-          minimal={true}
-          outlined={true}
-          type="submit" 
-          onClick={this.handleSubmit}>
-            Register
-        </Button>
-      </div>
-    )
-  }
-}
+      <Button
+        id="submit-btn"
+        large={true}
+        minimal={true}
+        outlined={true}
+        type="submit" 
+        onClick={handleSubmit}>
+          Register
+      </Button>
+    </div>
+  );
+};
 
 export default RegisterForm

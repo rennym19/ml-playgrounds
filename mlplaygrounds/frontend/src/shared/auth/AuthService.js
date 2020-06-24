@@ -43,10 +43,10 @@ class AuthService {
     return this.token !== undefined && this.username !== undefined ? true : false;
   }
 
-  getCredentialsFromResponseBody(response) {
+  getCredentialsFromResponseBody(result) {
     return {
-      username: response.body.user.username,
-      token: response.body.token
+      username: result.user.username,
+      token: result.token
     }
   }
 

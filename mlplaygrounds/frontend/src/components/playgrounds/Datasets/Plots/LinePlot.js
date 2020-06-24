@@ -34,13 +34,20 @@ const LinePlot = (props) => {
   const [formattedData, setFormattedData] = useState(undefined);
 
   useEffect(() => {
-    setFormattedData(formatLinePlotData(props.data));
+    if (props.data !== undefined)
+      setFormattedData(formatLinePlotData(props.data));
   }, [props.data]);
 
   return (
-    <Line 
-      data={formattedData}
-      options={props.options} />
+    <>
+      {
+        formattedData
+          ? <Line
+              data={formattedData}
+              options={props.options} />
+          : <></>
+      }
+    </>
   );
 };
 

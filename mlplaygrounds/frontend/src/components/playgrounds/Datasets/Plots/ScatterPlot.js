@@ -35,10 +35,10 @@ const ScatterPlot = (props) => {
     <>
       {
         formattedData
-        ? <Scatter
-            data={formattedData}
-            options={props.options} />
-        : <></>
+          ? <Scatter
+              data={formattedData}
+              options={props.options} />
+          : <></>
       }
     </>
   );

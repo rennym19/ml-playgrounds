@@ -3,7 +3,7 @@ import data_image from './images/undraw_data_xmfy.svg'
 
 import './AppInfo.css'
 
-function AppInfo(props) {
+const AppInfo = (props) => {
   return (
     <div className="AppInfo">
       <h1>ML Playgrounds</h1>
@@ -14,6 +14,6 @@ function AppInfo(props) {
       <img src={data_image} alt="Data manipulation by ML Playgrounds"/>
     </div>
   )
-}
+};
 
 export default AppInfo

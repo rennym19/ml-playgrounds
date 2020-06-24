@@ -63,7 +63,15 @@ const DatasetForm = (props) => {
           problemType: problemType,
           data: data
         },
-        clearState
+        (res) => {
+          props.addToDatasets({
+            uid: res.uid,
+            name: res.name,
+            problem_type: null,
+            user_id: null
+          });
+          clearState();
+        }
       );
   };
 

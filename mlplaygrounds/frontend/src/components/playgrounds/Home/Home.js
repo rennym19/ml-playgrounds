@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Spinner } from '@blueprintjs/core';
 import { useSpring, animated } from 'react-spring';
 
 import UsersAPIService from '../../../shared/data/api/Users';
@@ -15,6 +16,7 @@ const Home = (props) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [registrationDate, setRegistrationDate] = useState('');
+  const [retrievedData, setRetrievedData] = useState(false);
   const [datasets, setDatasets] = useState([]);
   const [selectedDataset, setSelectedDataset] = useState(undefined);
   const [showNavbarAddBtn, setShowNavbarAddBtn] = useState(true);
@@ -33,6 +35,7 @@ const Home = (props) => {
         setLastName(res.last_name);
         setRegistrationDate(res.registration_date);
         setDatasets(res.datasets);
+        setRetrievedData(true);
       },
       () => props.authService.authLogout()
     );
@@ -42,7 +45,9 @@ const Home = (props) => {
     DatasetPreferences.saveSelectedDataset(selectedDataset);
   }, [selectedDataset]);
 
-  const toggleShowNavbarAddBtn = () => { setShowNavbarAddBtn(!showNavbarAddBtn); }
+  const toggleShowNavbarAddBtn = () => setShowNavbarAddBtn(!showNavbarAddBtn);
+
+  const addToDatasets = (dataset) => datasets.push(dataset);
 
   return (
     <div id="Home">
@@ -62,15 +67,18 @@ const Home = (props) => {
                 selectedDataset={selectedDataset} />
             : <animated.div id="card-wrapper">
                 {
-                  datasets.length === 0 || !showNavbarAddBtn
-                  ? <NoDatasets
-                    authService={props.authService}
-                    showNavbarAddBtn={showNavbarAddBtn}
-                    toggleShowNavbarAddBtn={toggleShowNavbarAddBtn} />
-                  : <SelectDatasetCard
-                      authService={props.authService}
-                      datasets={datasets}
-                      setSelectedDataset={setSelectedDataset} />
+                  retrievedData
+                    ? datasets.length === 0 || !showNavbarAddBtn
+                      ? <NoDatasets
+                          authService={props.authService}
+                          showNavbarAddBtn={showNavbarAddBtn}
+                          toggleShowNavbarAddBtn={toggleShowNavbarAddBtn}
+                          addToDatasets={addToDatasets} />
+                      : <SelectDatasetCard
+                          authService={props.authService}
+                          datasets={datasets}
+                          setSelectedDataset={setSelectedDataset} />
+                    : <Spinner />
                 }
               </animated.div>
         }
