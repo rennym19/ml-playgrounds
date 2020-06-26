@@ -4,15 +4,36 @@
   flex-direction: column;
 }
 
+#models-card #header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 #models-card #title {
-  text-transform: uppercase;
-  color: #323232;
-  font-size: 12px;
+  color: #0c0c0c;
+  font-size: 24px;
   font-weight: bold;
+}
+
+#models-card #add-model-btn-wrapper {
+  flex-grow: 1;
+  text-align: right;
+}
+
+#add-model-btn {
+  background-color: #4d1ce0;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 #models-card #models, #models-card #no-models {
   flex-grow: 1;
+}
+
+#models-card #no-models {
   display: flex;
   justify-content: center;
   align-items: center;

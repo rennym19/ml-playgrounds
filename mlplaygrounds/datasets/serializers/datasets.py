@@ -9,6 +9,7 @@ from ..validators.datasets import (
 )
 from ..db.collections import Dataset
 from ..parsers.parser import ParsedDataset
+from .models import MLModelLiteSerializer
 
 
 class DatasetSerializer(serializers.Serializer):
@@ -28,6 +29,7 @@ class DatasetSerializer(serializers.Serializer):
     original_format = serializers.CharField(read_only=True)
     not_assigned_pct = serializers.FloatField(read_only=True)
     y_value_counts = serializers.ListField(read_only=True)
+    models = MLModelLiteSerializer(many=True, read_only=True)
 
     def __init__(self, instance=None, data=serializers.empty, *args, **kwargs):
         self.exclude_data = kwargs.pop('exclude_data', False)
@@ -38,6 +40,12 @@ class DatasetSerializer(serializers.Serializer):
 
     def _get_queryset(self):
         return Dataset.objects
+    
+    @classmethod
+    def data_fields(self):
+        return ['data', 'index_col', 'features', 'label', 'label_data',
+                'num_records', 'original_format', 'not_assigned_pct',
+                'y_value_counts']
 
     def to_representation(self, instance):
         representation = {}
@@ -47,33 +55,16 @@ class DatasetSerializer(serializers.Serializer):
         else:
             representation['uid'] = None
 
-        if hasattr(instance, 'user_id'):
-            representation['user_id'] = instance.user_id
-        else:
-            representation['user_id'] = None
-
-        if hasattr(instance, 'problem_type'):
-            representation['problem_type'] = instance.problem_type
-        else:
-            representation['problem_type'] = None
-        
-        representation['name'] = instance.name
+        representation['user_id'] = getattr(instance, 'user_id', None)
+        representation['problem_type'] = getattr(instance, 'problem_type', None)
+        representation['name'] = getattr(instance, 'name', None)
 
         if not self.exclude_data:
-            representation['data'] = instance.data
-            representation['index_col'] = getattr(instance, 'index_col', None)
-            representation['features'] = getattr(instance, 'features', None)
-            representation['label'] = getattr(instance, 'label', None)
-            representation['label_data'] = getattr(
-                instance, 'label_data', None)
-            representation['num_records'] = getattr(
-                instance, 'num_records', None)
-            representation['original_format'] = getattr(
-                instance, 'original_format', None)
-            representation['not_assigned_pct'] = getattr(
-                instance, 'not_assigned_pct', None)
-            representation['y_value_counts'] = getattr(
-                instance, 'y_value_counts', None)
+            for field in DatasetSerializer.data_fields():
+                representation[field] = getattr(instance, field, None)
+            
+            models = MLModelLiteSerializer(instance.models, many=True).data
+            representation['models'] = models
 
         return representation
     

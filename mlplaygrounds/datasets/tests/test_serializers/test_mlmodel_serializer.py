@@ -8,7 +8,6 @@ from rest_framework.serializers import ValidationError
 from bson import ObjectId
 
 from mlplaygrounds.datasets.serializers.models import MLModelSerializer
-from mlplaygrounds.datasets.db.collections import MLModel
 
 
 class TestMLModelSerializer(TestCase):

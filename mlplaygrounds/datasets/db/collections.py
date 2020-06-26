@@ -32,6 +32,14 @@ class Dataset(Collection):
     def create(self, **kwargs):
         return Collection.create_instance(Dataset, **kwargs)
 
+    @property
+    def models(self):
+        if self.uid and self.user_id:
+            return MLModel.objects.get_all({'dataset_id': self.uid,
+                                            'user_id': self.user_id},
+                                           cast_into_cls=MLModel)
+        return []
+
     def __str__(self):
         return f'{self.name} by {self.user_id}'
 

@@ -55,3 +55,9 @@ class MLModelSerializer(serializers.Serializer):
         if not isinstance(model, MLModel):
             raise TypeError('model must be of type MLModel')
         return MLModel.objects.save(model)
+
+
+class MLModelLiteSerializer(serializers.Serializer):
+    uid = serializers.CharField(read_only=True)
+    name = serializers.CharField(required=True)
+    algorithm = serializers.CharField(required=True)

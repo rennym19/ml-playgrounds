@@ -105,9 +105,9 @@ class TestDatasetDetailViews(DatasetViewTestCase):
         dataset = view.get_object(str(self.dummy_data[0]['_id']),
                                   self.dummy_data[0]['user_id'])
 
-        created_object_data = {
+        object_data = {
             'name': dataset.name,
             'user_id': dataset.user_id,
             'data': dataset.data
         }
-        self.assertDictEqual(document, created_object_data)
+        self.assertDictEqual(document, object_data)

@@ -28,7 +28,9 @@ class Models(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        serializer = MLModelSerializer(data=request.data)
+        data = {**request.data, **{'user_id': request.user.username}}
+
+        serializer = MLModelSerializer(data=data)
         if serializer.is_valid():
             model = serializer.create()
             model = serializer.save(model)

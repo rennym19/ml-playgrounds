@@ -9,42 +9,32 @@ from django.contrib.auth import get_user_model
 
 from rest_framework.serializers import ValidationError
 
-from mlplaygrounds.datasets.db.collections import Dataset
+from mlplaygrounds.datasets.db.collections import Dataset, MLModel
 from mlplaygrounds.datasets.parsers.parser import ParsedDataset
 from mlplaygrounds.datasets.serializers.datasets import DatasetSerializer
+from mlplaygrounds.datasets.serializers.models import MLModelLiteSerializer
 from ..mocks.managers import MockDatasetManager
 
 
 class TestDatasetSerializer(TestCase):
     def setUp(self):
-        self.valid_instance = MockModel(name='Dataset',
-                                        user_id='testuser',
-                                        data={'id': 1, 'foo': 'bar', 'bool': True},
-                                        index_col='id',
-                                        label='foo',
-                                        label_data='bar',
-                                        num_records=1,
-                                        features=['foo', 'bar'],
-                                        original_format='csv',
-                                        not_assigned_pct=0,
-                                        problem_type="classification",
-                                        y_value_counts=[])
-        
-        self.expected_valid_instance_data = {
-            'uid': None,
-            'name': self.valid_instance.name,
-            'user_id': self.valid_instance.user_id,
-            'data': self.valid_instance.data,
-            'index_col': self.valid_instance.index_col,
-            'label': self.valid_instance.label,
-            'label_data': self.valid_instance.label_data,
-            'num_records': self.valid_instance.num_records,
-            'features': self.valid_instance.features,
-            'original_format': self.valid_instance.original_format,
-            'not_assigned_pct': self.valid_instance.not_assigned_pct,
-            'problem_type': self.valid_instance.problem_type,
-            'y_value_counts': self.valid_instance.y_value_counts
-        }
+        self.valid_instance = MockModel(
+            uid=None, name='Dataset', user_id='testuser',
+            data={'id': 1, 'foo': 'bar', 'bool': True}, index_col='id',
+            label='foo', label_data='bar', num_records=1,
+            features=['foo', 'bar'], original_format='csv', not_assigned_pct=0,
+            problem_type="classification", y_value_counts=[],
+            models=[MLModel.create(name='model', algorithm='test algorithm')]
+        )
+
+        instance_dict = dict(self.valid_instance)
+        instance_dict['models'] = MLModelLiteSerializer(
+            instance_dict['models'], many=True).data
+
+        del instance_dict['save']
+        del instance_dict['_MockModel__meta']
+
+        self.expected_valid_instance_data = instance_dict
 
     def test_instance_serialization(self):
         serializer = DatasetSerializer(self.valid_instance)
@@ -124,20 +114,7 @@ class TestDatasetSerializer(TestCase):
         serializer.is_valid()
         dataset = serializer.create()
 
-        self.assertDictEqual({
-            'name': dataset.name,
-            'user_id': dataset.user_id,
-            'problem_type': dataset.problem_type,
-            'data': dataset.data,
-            'features': dataset.features,
-            'label': dataset.label,
-            'label_data': dataset.label_data,
-            'index_col': dataset.index_col,
-            'num_records': dataset.num_records,
-            'original_format': dataset.original_format,
-            'not_assigned_pct': dataset.not_assigned_pct,
-            'y_value_counts': dataset.y_value_counts
-        }, {
+        self.assertDictEqual(dataset.__dict__, {
             'name': data['name'],
             'user_id': data['user_id'],
             'problem_type': data['problem_type'],
