@@ -1,0 +1,34 @@
+.model-form-dialog {
+  background-color: #2cc18f;
+  color: white;
+  padding-bottom: 0;
+}
+
+.model-form-dialog label {
+  color: #9de9cf;
+}
+
+.model-form-dialog-body {
+  margin: 0;
+}
+
+#model-dialog-header {
+  display: flex;
+  justify-content: center;
+  padding-right: 15px;
+  background-color: #2cc18f;
+}
+
+#model-dialog-close {
+  flex-grow: 1;
+  text-align: right;
+}
+
+#model-dialog-close .close-icon-wrapper {
+  padding: 5px;
+}
+
+#model-dialog-close .close-icon-wrapper:hover {
+  color: darkred;
+  background-color: lightgray;
+}

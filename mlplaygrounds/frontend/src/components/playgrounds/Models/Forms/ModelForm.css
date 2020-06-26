@@ -1,0 +1,24 @@
+#model-form-wrapper {
+  margin: 20px;
+}
+
+#submit-model-btn {
+  background-color: #1e8361;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+  border-radius: 0 0 6px 6px;
+  border-color: rgba(255,255,255,0);
+  border-radius: 0;
+}
+
+#model-form-wrapper .bp3-input {
+  background-color: #5fdbb1;
+  box-shadow: none;
+}
+
+.select-wrapper .bp3-popover-target {
+  width: 100%;
+  background-color: #5fdbb1;
+  border-radius: 2px;
+}

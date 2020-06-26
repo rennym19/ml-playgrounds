@@ -13,7 +13,6 @@ import './Dataset.css';
 
 const Dataset = (props) => {
   const [dataset, setDataset] = useState(undefined);
-  const [models, setModels] = useState(undefined);
 
   useEffect(() => {
     getDataset();
@@ -26,23 +25,8 @@ const Dataset = (props) => {
     DatasetsAPIService.getDataset(
       datasetId,
       userToken,
-      (res) => {
-        setDataset(res);
-        if (models !== undefined) {
-          setModels(undefined);
-        }
-
-        ModelsAPIService.getModels(
-          userToken,
-          datasetId,
-          (res) => { setModels(res); }
-        );
-      }
+      (res) => { setDataset(res); }
     );
-  }
-
-  const getModels = () => {
-
   }
 
   return (
@@ -88,8 +72,12 @@ const Dataset = (props) => {
               y_value_counts={dataset.y_value_counts} />
           </div>
           <div id="dataset-models">
-            <DatasetModels 
-              models={[]}/>
+            <DatasetModels
+              authService={props.authService}
+              models={dataset.models}
+              datasetId={dataset.uid}
+              features={dataset.features}
+              problemType={dataset.problem_type}/>
           </div>
         </div>
       : <div id="loading">
