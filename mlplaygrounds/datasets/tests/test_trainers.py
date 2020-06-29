@@ -8,17 +8,16 @@ from mlplaygrounds.datasets.trainers.base import Trainer, FeatureTypeError
 class TestTrainer(TestCase):
     def setUp(self):
         self.X = [
-            {'x_one': 1, 'x_two': 4, 'x_three': 1},
-            {'x_one': 2, 'x_two': 6, 'x_three': 1},
-            {'x_one': 3, 'x_two': 7, 'x_three': 1},
-            {'x_one': 4, 'x_two': None, 'x_three': 1},
-            {'x_one': 5, 'x_two': 7, 'x_three': 1}
+            {'x_one': 1, 'x_two': 4, 'x_three': 1, 'val': 5},
+            {'x_one': 2, 'x_two': 6, 'x_three': 1, 'val': 8},
+            {'x_one': 3, 'x_two': 7, 'x_three': 1, 'val': 10},
+            {'x_one': 4, 'x_two': None, 'x_three': 1, 'val': 9},
+            {'x_one': 5, 'x_two': 7, 'x_three': 1, 'val': 12}
         ]
-        self.y = [5, 8, 10, 9, 12]
         self.exclude_features = ['x_three']
         self.alg = 'linear regression'
 
-        self.trainer = Trainer(self.X, self.y, self.exclude_features, self.alg)
+        self.trainer = Trainer(self.X, 'val', self.exclude_features, self.alg)
 
     def test_valid_features_to_exclude(self):
         res = self.trainer.features_to_exclude_are_valid(self.exclude_features)

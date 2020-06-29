@@ -11,9 +11,9 @@ VALID_ALGORITHMS = ['linear regression']
 
 
 class Trainer:
-    def __init__(self, X, y, exclude_features, algorithm):
+    def __init__(self, X, y_column, exclude_features, algorithm):
         self.X = pd.DataFrame(X)
-        self.y = y
+        self.y = self.X.pop(y_column)
 
         if self.features_to_exclude_are_valid(exclude_features):
             self.exclude_features = exclude_features

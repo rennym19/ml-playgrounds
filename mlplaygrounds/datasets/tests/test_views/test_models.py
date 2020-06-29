@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch, PropertyMock
+from unittest.mock import patch, PropertyMock, Mock
 
 from django.core.exceptions import SuspiciousOperation
 from django.http import Http404
@@ -10,7 +10,7 @@ from rest_framework import status
 from bson import ObjectId
 
 from mlplaygrounds.datasets.db.collections import MLModel
-from mlplaygrounds.datasets.views.models import ModelDetail
+from mlplaygrounds.datasets.views.models import Models, ModelDetail
 from .testcases import ModelViewTestCase
 
 
@@ -25,6 +25,9 @@ class TestModels(ModelViewTestCase):
         for model in expected_models:
             model['uid'] = str(model.pop('_id'))
             model['dataset_id'] = str(model['dataset_id'])
+            model['features'] = None
+            model['coefficients'] = None
+            model['error'] = None
 
         mock_data.return_value = expected_models
 
@@ -36,6 +39,9 @@ class TestModels(ModelViewTestCase):
         expected = self.dummy_data[1].copy()
         expected['uid'] = str(expected.pop('_id'))
         expected['dataset_id'] = str(expected['dataset_id'])
+        expected['features'] = None
+        expected['coefficients'] = None
+        expected['error'] = None
 
         response = self.client.get(self.url, {
             'dataset_id': expected['dataset_id']
@@ -51,17 +57,22 @@ class TestModels(ModelViewTestCase):
         response = self.client.get(self.url, {'dataset_id': '1234'})
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
+    @patch('mlplaygrounds.datasets.views.models.Models.get_trained_model')
     @patch('mlplaygrounds.datasets.views.models.MLModelSerializer.create')
     @patch('mlplaygrounds.datasets.views.models.MLModelSerializer.is_valid')
-    def test_post_valid_model(self, mock_is_valid, mock_create):
+    def test_post_valid_model(self, mock_is_valid, mock_create, mock_trainer):
         expected = {
             'name': 'model',
             'algorithm': 'ml algorithm',
             'user_id': 'test_user',
-            'dataset_id': 'test_dataset'
+            'dataset_id': 'test_dataset',
+            'features': None,
+            'coefficients': None,
+            'error': None
         }
         mock_is_valid.return_value = True
         mock_create.return_value = MLModel.create(**expected)
+        mock_trainer.return_value = Mock()
 
         response = self.client.post(self.url, expected, format='json')
         
@@ -77,6 +88,30 @@ class TestModels(ModelViewTestCase):
         response = self.client.post(self.url, {}, format='json')
 
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+    
+    @patch('mlplaygrounds.datasets.views.models.ObjectId')
+    @patch('mlplaygrounds.datasets.views.models.Dataset.objects.get')
+    def test_get_dataset(self, mock_get, mock_object_id):
+        mock_get.return_value = Mock(uid='id')
+
+        models_view = Models()
+        res = models_view.get_dataset('id', 'user_id')
+
+        self.assertEqual(res.uid, 'id')
+    
+    def test_get_dataset_no_id(self):
+        with self.assertRaises(SuspiciousOperation):
+            models_view = Models()
+            models_view.get_dataset(None, 'user_id')
+        
+    @patch('mlplaygrounds.datasets.views.models.ObjectId')
+    @patch('mlplaygrounds.datasets.views.models.Dataset.objects.get')
+    def test_dataset_not_found(self, mock_get, mock_object_id):
+        mock_get.return_value = None
+
+        with self.assertRaises(Http404):
+            models_view = Models()
+            models_view.get_dataset('id', 'user_id')
 
 
 class TestModelDetail(ModelViewTestCase):

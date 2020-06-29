@@ -13,8 +13,9 @@ const ModelForm = (props) => {
   let algorithms = [];
   if (props.problemType === 'regression') {
     algorithms = [
-      {name: 'Linear Regression', val: 'linear'},
-      {name: 'Decission Tree', val: 'decisiontree'}
+      {name: 'Linear Regression', val: 'linear regression'},
+      {name: 'Decission Tree', val: 'decision tree'},
+      {name: 'Random Forests', val: 'random forests'},
     ];
   } else if (props.problemType === 'classification') {
     algorithms = [
@@ -101,7 +102,7 @@ const ModelForm = (props) => {
       {
         name: name,
         algorithm: algorithm.val,
-        features: selectedFeatures,
+        features_to_exclude: selectedFeatures,
         dataset_id: props.datasetId,
       }
     );

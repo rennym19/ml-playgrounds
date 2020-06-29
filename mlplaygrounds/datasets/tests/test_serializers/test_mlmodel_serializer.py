@@ -7,6 +7,7 @@ from rest_framework.serializers import ValidationError
 
 from bson import ObjectId
 
+from mlplaygrounds.datasets.db.collections import MLModel
 from mlplaygrounds.datasets.serializers.models import MLModelSerializer
 
 
@@ -15,15 +16,18 @@ class TestMLModelSerializer(TestCase):
         self.valid_instance = MockModel(uid=ObjectId(),
                                         name='test model',
                                         user_id='test_user',
-                                        dataset_id='test_dataset',
+                                        dataset_id=ObjectId(),
                                         algorithm='testalg')
         
         self.data = {
             'uid': str(self.valid_instance.uid),
             'name': self.valid_instance.name,
             'user_id': self.valid_instance.user_id,
-            'dataset_id': self.valid_instance.dataset_id,
+            'dataset_id': str(self.valid_instance.dataset_id),
             'algorithm': self.valid_instance.algorithm,
+            'features': None,
+            'coefficients': None,
+            'error': None
         }
     
     def test_serialize_instance(self):
@@ -37,9 +41,9 @@ class TestMLModelSerializer(TestCase):
                                             many=True).data
         
         self.assertListEqual(serialized_data, [self.data, self.data])
-    
-    @patch.object(MLModelSerializer, 'validate_dataset_id')
+
     @patch.object(MLModelSerializer, 'validate_user_id')
+    @patch.object(MLModelSerializer, 'validate_dataset_id')
     def test_validate_data(self, mock_valid_dataset_id, mock_valid_user_id):
         mock_valid_dataset_id.return_value = self.data['dataset_id']
         mock_valid_user_id.return_value = self.data['user_id']
@@ -54,6 +58,17 @@ class TestMLModelSerializer(TestCase):
         with self.assertRaises(ValidationError):
             serializer.is_valid(raise_exception=True)
     
+    def test_validate_required_field_set(self):
+        serializer = MLModelSerializer(data=self.data)
+
+        serializer.validate_field_set(serializer.initial_data, 'name')
+
+    def test_validate_required_field_not_set(self):
+        serializer = MLModelSerializer(data={})
+
+        with self.assertRaises(ValidationError):
+            serializer.validate_field_set(serializer.initial_data, 'name')
+
     @patch('mlplaygrounds.datasets.serializers.models.User.objects')
     def test_validate_invalid_user_id(self, mock_query):
         mock_query.filter.return_value = mock_query
@@ -88,7 +103,7 @@ class TestMLModelSerializer(TestCase):
     @patch.object(MLModelSerializer, 'validate_user_id')
     @patch.object(MLModelSerializer, 'validate_dataset_id')
     def test_create(self, mock_validate_dataset_id, mock_validate_user_id):
-        mock_validate_dataset_id.return_value = self.data['dataset_id']
+        mock_validate_dataset_id.return_value = self.valid_instance.dataset_id
         mock_validate_user_id.return_value = self.data['user_id']
         
         del self.data['uid']
@@ -96,7 +111,12 @@ class TestMLModelSerializer(TestCase):
         serializer = MLModelSerializer(data=self.data)
         if serializer.is_valid():
             instance = serializer.create()
-            self.assertDictEqual(instance.__dict__, self.data)
+            self.assertDictEqual(instance.__dict__, {
+                'algorithm': self.valid_instance.algorithm,
+                'name': self.valid_instance.name,
+                'dataset_id': self.valid_instance.dataset_id,
+                'user_id': self.valid_instance.user_id
+            })
     
     @patch('mlplaygrounds.datasets.serializers.models.MLModel.objects.update')
     def test_update(self, mock_update):

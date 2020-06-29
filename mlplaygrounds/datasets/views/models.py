@@ -9,7 +9,8 @@ from bson import ObjectId
 from bson.errors import InvalidId
 
 from ..serializers.models import MLModelSerializer
-from ..db.collections import MLModel
+from ..db.collections import MLModel, Dataset
+from ..trainers.base import Trainer, FeatureTypeError
 
 
 class Models(APIView):
@@ -28,7 +29,13 @@ class Models(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        data = {**request.data, **{'user_id': request.user.username}}
+        user_id = request.user.username
+
+        trained_model = self.get_trained_model(request.data, user_id)
+        data = {
+            **request.data,
+            **{'user_id': user_id, 'trained_model': trained_model}
+        }
 
         serializer = MLModelSerializer(data=data)
         if serializer.is_valid():
@@ -37,6 +44,29 @@ class Models(APIView):
             return Response(MLModelSerializer(model).data,
                             status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def get_trained_model(self, data, user_id):
+        dataset = self.get_dataset(data.get('dataset_id', None), user_id)
+        
+        try:
+            trainer = Trainer(dataset.data,
+                              dataset.label,
+                              data.get('features_to_exclude', []),
+                              data.get('algorithm', None))
+            return trainer.train()
+        except (FeatureTypeError, KeyError, ValueError) as e:
+            raise SuspiciousOperation(str(e))
+    
+    def get_dataset(self, dataset_id, user_id):
+        if dataset_id is None:
+            raise SuspiciousOperation('Dataset ID needed')
+        
+        dataset = Dataset.objects.get({'_id': ObjectId(dataset_id),
+                                       'user_id': user_id},
+                                      cast_into_cls=Dataset)
+        if dataset is None:
+            raise Http404(f'Could not find a dataset of ID {dataset_id}')
+        return dataset
 
 
 class ModelDetail(APIView):

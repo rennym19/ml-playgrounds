@@ -16,6 +16,57 @@ class MLModelSerializer(serializers.Serializer):
     algorithm = serializers.CharField(required=True)
     dataset_id = serializers.CharField(required=True)
     user_id = serializers.CharField(required=True)
+    features = serializers.ListField(required=False, default=None)
+    coefficients = serializers.ListField(required=False, default=None)
+    error = serializers.FloatField(required=False, default=None)
+
+    REQUIRED_FIELDS = ['name', 'algorithm', 'dataset_id', 'user_id']
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        
+        if isinstance(representation['uid'], ObjectId):
+            representation['uid'] = str(representation['uid'])
+        
+        if isinstance(representation['dataset_id'], ObjectId):
+            representation['dataset_id'] = str(representation['dataset_id'])
+
+        return representation
+
+    def to_internal_value(self, data):
+        dataset_id = data.get('dataset_id', None)
+        trained_model = data.get('trained_model', None)
+
+        internal_val = {
+            'user_id': data.get('user_id', None),
+            'name': data.get('name', None),
+            'algorithm': data.get('algorithm', None),
+            'dataset_id': ObjectId(dataset_id) if dataset_id else None
+        }
+
+        if trained_model:
+            internal_val['features'] = trained_model.features
+            internal_val['coefficients'] = trained_model.coefficients()
+            internal_val['error'] = trained_model.error()
+
+        uid = data.get('uid', None)
+        if not isinstance(uid, ObjectId) and uid is not None:
+            internal_val['uid'] = ObjectId(data['uid'])
+
+        return internal_val
+
+    def validate(self, data):
+        for field in self.REQUIRED_FIELDS:
+            self.validate_field_set(data, field)
+
+        data['dataset_id'] = self.validate_dataset_id(data['dataset_id'])
+        data['user_id'] = self.validate_user_id(data['user_id'])
+
+        return data
+
+    def validate_field_set(self, data, val):
+        if val not in data:
+            raise serializers.ValidationError(f'{val} not in data')
 
     def validate_dataset_id(self, id):
         object_id = None
