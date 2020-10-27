@@ -3,7 +3,7 @@ astroid==2.4.1
 attrs==19.3.0
 bson==0.5.8
 cffi==1.14.0
-cryptography==2.9.2
+cryptography==3.2
 dataclasses==0.6
 Django==3.0.7
 django-mock-queries==2.1.5
